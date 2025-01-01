@@ -1,0 +1,45 @@
+<div class="container" style="
+    background-image: url('assets/images/typewritter.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    ">
+    <h1>The Writers Section</h1>
+
+    <!-- Success Stories Button -->
+    <button class="button" id="success-stories-btn" (click)="openModal()">Success Stories</button>
+
+    <!-- Daily Writing Prompt Box -->
+    <div class="box prompt-box">
+        <p id="daily-prompt">"Even the best writers in the world need inspiration. Yours is just a click away!"</p>
+        <a routerLink="/writing-prompt" class="button">Writing Prompt of the Day</a>
+    </div>
+
+    <!-- Daily Tip Box -->
+    <div class="box tip-box">
+        <p id="daily-tip">{{ dailyTip }}</p>
+        <button class="button" (click)="generateDailyTip()">New Tip of the Day</button>
+    </div>
+
+    <!-- Start Writing Button -->
+    <a routerLink="/write" class="button">Start Writing...</a>
+    <a routerLink="/resources" class="button" id="bookswrite">Resources</a>
+
+    <!-- Modal for Success Stories -->
+    <div id="success-stories-modal" class="modal" [class.show]="modalOpen">
+        <div class="modal-content">
+            <span class="close" (click)="closeModal()">&times;</span>
+            <img id="author-image" [src]="currentAuthor.image" alt="Author Image">
+            <h2 id="author-name">{{ currentAuthor.name }}</h2>
+            <p id="author-story">{{ currentAuthor.story }}</p>
+            <a id="author-link" [href]="currentAuthor.link" target="_blank">Read full story</a>
+
+
+            <div class="nav-buttons">
+                <button id="prev-btn" (click)="showAuthor('prev')">Previous</button>
+                <button id="next-btn" (click)="showAuthor('next')">Next</button>
+            </div>
+        </div>
+    </div>
+</div>

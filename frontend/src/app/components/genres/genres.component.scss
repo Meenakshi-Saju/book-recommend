@@ -1,0 +1,362 @@
+@use 'sass:math';
+
+body, html {
+  margin: 0;
+  padding: 0;
+  background: #002142;
+  margin-top: -50px;
+  font-family: Roboto, -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
+
+}
+
+.container1 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #344faf;
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  text-align: center;
+  z-index: 10;
+}
+
+h1 {
+  font-size: 45px;
+}
+
+.inner-headings {
+  border: 0px solid #ddd;
+  height: 50px; 
+  line-height: 50px;
+  font-size: 45px;
+  text-transform: uppercase;
+  overflow: hidden;
+  position: relative;
+}
+
+.inner-headings span {
+  position: relative; 
+  width: 100%; 
+  // color: #002142;
+  animation: animation 8s ease infinite; /* Increased from 4s to 8s */
+  cursor: pointer;
+}
+
+@keyframes animation {
+  0%, 35% {
+    top: 0; 
+  }
+  50%, 85% {
+    top: -50px;
+  }
+  100% {
+    top: 0; 
+  }
+}
+
+
+.modal-content {
+  background: rgb(0, 33, 66, 0.6);
+  padding: 20px;
+  width: 300px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+  position: relative;
+}
+
+.modal-content h2 {
+  margin-bottom: 15px;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  color: white;
+}
+
+.checkbox-group {
+  margin-top: 10px;
+  padding-left: 15px;  /* Adds space to the left of the checkboxes */
+}
+
+.checkbox-group label {
+  display: block;
+  margin-bottom: 12px;  /* Adds space between checkboxes */
+  font-size: 18px;  /* Increases font size for better readability */
+  line-height: 1.5;
+}
+
+
+textarea {
+  width: 80%;
+  min-height: 100px;
+  margin: 10px 0;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  resize: vertical;
+}
+
+.submit-button {
+  background: #0073e7;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.submit-button:hover {
+  background: #344faf;
+}
+
+.con {
+  width: 100%;
+  background: #002142;
+  height: 900px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header,.outer-headings {
+
+  position: absolute;
+  font-family: "Times New Roman", sans-serif;
+  color: #FEFDE8;
+  text-align: center;
+  padding: 20px; /* Adds space inside the box around the text */
+  width: auto; /* Automatically adjusts the width to fit the content */
+  height: auto; /* Automatically adjusts the height to fit the content */
+
+  /* Centering adjustments */
+  top: 100px; /* Align to the top */
+  left: 50%; /* Move horizontally to center */
+  transform: translateX(-50%); /* Offset by half the width to center it */
+}
+
+@for $i from 1 through 8 {
+  
+  
+  .shoot:nth-child(#{$i}) {
+    width:5px;
+    height:5px;
+    background:#FEFCE6;
+    box-shadow: 0px 1px 30px 0px rgba(255, 255, 255, 1);
+    z-index:400;
+    position:absolute;
+    border-radius:50%;
+    margin-left:-1040px;
+    animation: shoot-#{$i} random(4) + s linear 1; 
+    animation-delay:$i*0.01s;
+}
+
+  @keyframes shoot-#{$i} {
+  0% {
+    margin-left:0px;
+    margin-top:100px;
+    width:8px;
+    height:8px;
+  } 
+  100% {
+    margin-left:900px;
+    margin-top:150px + random(40);
+    width:0px;
+    height:0px;
+  }
+}
+  
+}
+
+
+@for $i from 1 through 8 {
+  .moon:nth-child(#{$i}) 
+  {
+    
+    $d: $i * 100px;
+    width:$d;
+    height:$d;
+    
+    
+    border-radius:50%;
+    
+    background:#FEFCE6;
+    box-shadow: 0px 1px 30px 0px rgba(255, 255, 255, 1);
+    
+    
+    opacity: math.div(1, $i * 5);
+    
+    position:absolute;
+    z-index:10;
+    
+    margin-left:calc(50% - #{$d}/2);
+    margin-top:calc(400px - #{$d}/2);
+    
+  }
+  
+  
+  .moon:nth-child(1) {
+    opacity: 1;
+    
+    $d: 150px;
+    width:$d;
+    z-index:10;
+    height:$d;
+    
+    margin-left:calc(50% - #{$d}/2);
+    margin-top:calc(400px - #{$d}/2);
+  } 
+}
+
+
+
+.stars  {
+    width:100%;
+    height:875px;
+    overflow:hidden;
+    margin:0 auto;
+    margin-top:0px;
+    position:relative;
+  
+  }
+
+$stars:200;
+
+@for $i from 0 through $stars {
+  .star:nth-child(#{$i})  {
+    $d: random(2);
+    width: $d + px;
+    height: $d + px;
+    z-index:1;
+    background:white;
+    
+    border-radius:50%;
+     
+    position:absolute;
+    
+    opacity: 1;
+    
+    margin-left:random(1500) + px;
+    margin-top:random(875) + px;
+    
+    animation: twinkle-#{$i} 1s linear infinite;
+    animation-delay:$i*0.01s;
+  }
+  
+  @keyframes twinkle-#{$i} {
+    from {
+      opacity:1;
+    }
+    
+    to {
+      opacity:0.3;
+    }
+  }
+
+}
+
+.h-con {
+  //outline:1px solid red;
+  width:100%;
+  height:300px;
+  position:absolute;
+  //overflow:hidden;
+  margin-top:450px;
+  //margin-left:calc(50% - 500px);
+  z-index:100;
+  margin-left:calc(50% - 350px);
+}
+
+.hill {
+  width:700px;
+  height:1000px;
+  z-index:130;
+  //border:1px solid red;
+  border-radius:30px;
+  transform:rotate(45deg);
+  box-shadow: 0px 1px 30px 0px rgba(0, 0, 0, 0.5);
+  margin-top:100px;
+  position:absolute;
+  margin-left:-200px;
+  
+  background:linear-gradient(to bottom right, #002142, #27435F)
+}
+
+.hill2 {
+  width:800px;
+  height:1000px;
+  background:#002142;
+  z-index:130;
+  //border:1px solid red;
+  border-radius:30px;
+  transform:rotate(45deg);
+  box-shadow: 0px 1px 30px 0px rgba(0, 0, 0, 0.5);
+  margin-top:100px;
+  position:absolute;
+  margin-left:-100px;
+  
+  background:linear-gradient(to top right, #002142, #27435F)
+}
+
+
+.hill3 {
+  width:600px;
+  height:1000px;
+  background:#002142;
+  z-index:130;
+  //border:1px solid red;
+  border-radius:30px;
+  transform:rotate(45deg);
+  box-shadow: 0px 1px 30px 0px rgba(0, 0, 0, 0.5);
+  margin-top:100px;
+  position:absolute;
+  margin-left:50px;
+  
+  background:linear-gradient(to bottom right, #002142, #27435F)
+}
+
+
+.outer-headings{
+  top: 230px; /* Align to the top */
+  left: 50%; 
+  z-index: 99;
+  color: #002142;
+}
+.modal {
+  display: none; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 140;
+}
+
+.modal-content {
+  background: rgb(0, 33, 66, 0.6);
+  padding: 20px;
+  width: 300px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+  position: relative;
+}
+
+.modal-content h2 {
+  margin-bottom: 15px;
+}

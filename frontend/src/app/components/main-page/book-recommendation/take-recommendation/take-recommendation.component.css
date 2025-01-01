@@ -1,0 +1,211 @@
+/* Center the loading message */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    color: #333;
+    text-align: center;
+}
+
+/* Form Box Container */
+.form-box {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ff7e5f, #feb47b, #86a8e7, #7f7fd5);
+    background-size: 400% 400%;
+    animation: gradientShift 10s ease infinite;
+    color: #fff;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+/* Gradient Animation */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Hourglass animation */
+.hourglass {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(transparent 50%, #555 50%);
+    position: relative;
+    animation: hourglass 1.5s infinite;
+    margin-bottom: 10px;
+}
+
+.hourglass::before,
+.hourglass::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    background: #555;
+}
+
+.hourglass::before {
+    top: 0;
+    border-radius: 50% 50% 0 0;
+    animation: upperSand 1.5s infinite;
+}
+
+.hourglass::after {
+    bottom: 0;
+    border-radius: 0 0 50% 50%;
+    animation: lowerSand 1.5s infinite;
+}
+
+/* Text styling for loading */
+.loading-text {
+    font-size: 1.5em;
+    color: #555;
+    margin-top: 10px;
+}
+
+/* Keyframes for hourglass animation */
+@keyframes hourglass {
+
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(180deg);
+    }
+}
+
+@keyframes upperSand {
+
+    0%,
+    50% {
+        height: 50%;
+    }
+
+    100% {
+        height: 0;
+    }
+}
+
+@keyframes lowerSand {
+
+    0%,
+    50% {
+        height: 0;
+    }
+
+    100% {
+        height: 50%;
+    }
+}
+
+/* Book Details Section */
+.recommended-content {
+    display: block;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #ff7e5f, #feb47b, #86a8e7, #7f7fd5);
+    background-size: 400% 400%;
+    animation: gradientShift 10s ease infinite;
+    color: #fff;
+    text-align: center;
+}
+
+/* Book Details Container */
+.book-details {
+    margin-bottom: 40px;
+    padding: 20px;
+    border-radius: 8px;
+    /* background: linear-gradient(135deg, #ff7e5f, #feb47b, #86a8e7, #7f7fd5); */
+    background-color: #f9fdff;
+    background-size: 400% 400%;
+    animation: gradientShift 10s ease infinite;
+}
+
+.book-info p {
+    font-size: 1.2em;
+    margin: 8px 0;
+    color: #333;
+    /* Text color changed to black */
+}
+
+.book-link {
+    color: #007bff;
+    font-size: 1.2em;
+    text-decoration: none;
+}
+
+.book-link:hover {
+    text-decoration: underline;
+}
+
+/* Playlist Section */
+.playlist-details {
+    margin-top: 20px;
+}
+
+.song-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.song-item {
+    padding: 15px;
+    border-radius: 8px;
+    /* background: linear-gradient(135deg, #ff7e5f, #feb47b, #86a8e7, #7f7fd5); */
+    background-color: #f9fdff;
+    background-size: 400% 400%;
+    animation: gradientShift 10s ease infinite;
+    text-align: left;
+}
+
+.section-title {
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.song-item p {
+    font-size: 1.1em;
+    color: #444;
+    margin: 5px 0;
+}
+
+/* Gradient Animation for Containers */
+@keyframes containerGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}

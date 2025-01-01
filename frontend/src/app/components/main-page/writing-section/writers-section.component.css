@@ -1,0 +1,181 @@
+/* Body Styling */
+body {
+    color: #F4F4F9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Dark background for readability */
+    overflow-x: hidden;
+}
+
+.container {
+    font-family: 'Roboto', sans-serif;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+h1 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 2.5em;
+    color: #F4F4F9;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+/* Box Styling */
+.box {
+    width: 100%;
+    max-width: 600px;
+    padding: 25px;
+    margin: 15px 0;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.85);
+    transition: transform 0.3s ease;
+}
+
+.box:hover {
+    transform: translateY(-5px);
+}
+
+/* Specific Box Styles */
+.prompt-box {
+    background: rgba(235, 245, 255, 0.85);
+    border-left: 5px solid #007bff;
+}
+
+.tip-box {
+    background: rgba(255, 247, 227, 0.85);
+    font-style: italic;
+    border-left: 5px solid #f5b642;
+}
+
+/* Text Styling */
+#daily-prompt,
+#daily-tip {
+    color: #444;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+/* Button Styling */
+.button {
+    display: inline-block;
+    padding: 12px 25px;
+    margin-top: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(135deg, hsl(20, 100%, 50%) 0%, hsl(0, 100%, 35%) 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    text-decoration: none;
+}
+
+.button:hover {
+    background: linear-gradient(135deg, #b30000 0%, #8a0000 100%);
+    transform: scale(1.05);
+}
+
+#bookswrite {
+    align-self: left;
+    margin-top: 20px;
+}
+
+/* Modal Styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding-top: 60px;
+}
+
+.modal.show {
+    display: block;
+}
+
+.modal-content {
+    background-color: rgba(10, 10, 10, 0.95);
+    margin: 5% auto;
+    padding: 25px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content a#author-link {
+    margin-bottom: 20px;
+    /* Adjust the spacing as needed */
+    display: inline-block;
+    /* Ensure margin applies as expected */
+}
+
+.modal-content img {
+    width: 50%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+    font-size: 1.8em;
+    color: #fff;
+}
+
+.modal-content p {
+    font-size: 1.2em;
+    color: #dcdcdc;
+}
+
+.modal-content a {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.modal-content .close {
+    color: #fff;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    cursor: pointer;
+}
+
+.nav-buttons button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 0 10px;
+    cursor: pointer;
+    background-color: #5c1d00;
+    color: #f6f0f0;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-buttons button:hover {
+    background-color: #763314;
+}

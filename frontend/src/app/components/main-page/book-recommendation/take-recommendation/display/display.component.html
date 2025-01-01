@@ -1,0 +1,66 @@
+<!-- <div class="real" *ngIf="recommendedBook && recommendedPlaylist.length > 0; else noRecommendation">
+    <div class="card book-card">
+        <h3>Recommended Book</h3>
+        <p><strong>Title:</strong> {{ recommendedBook.title }}</p>
+        <p><strong>Author:</strong> {{ recommendedBook.author }}</p>
+        <p><strong>Genre:</strong> {{ recommendedBook.genre }}</p>
+        <p><strong>Description:</strong> {{ recommendedBook.description }}</p>
+        <p><a [href]="recommendedBook.url" target="_blank">View on Goodreads</a></p>
+    </div>
+
+    <div class="card playlist-card">
+        <h3>Recommended Playlist</h3>
+        <ul>
+            <li *ngFor="let song of recommendedPlaylist">
+                {{ song.song }} by {{ song.artist }} ({{ song.year }}) - {{ song.genre }}
+            </li>
+        </ul>
+    </div>
+</div>
+
+<ng-template #noRecommendation>
+    <p>No recommendation available at this moment.</p>
+</ng-template> -->
+
+<div class="real" *ngIf="recommendedBook && recommendedPlaylist.length > 0; else noRecommendation">
+    <div class="card book-card">
+        <div class="heading-container" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3>Recommended Book</h3>
+            <div class="match-scores" style="text-align: right;">
+                <!-- Add *ngIf to check if match_scores exists -->
+                <ng-container *ngIf="recommendedBook.match_scores; else noScores">
+                    <span class="overall-match" style="font-weight: bold; color: #4CAF50;">
+                        {{ recommendedBook.match_scores.overall_match | number:'1.0-1' }}% Match
+                    </span>
+                    <div class="detailed-scores" style="font-size: 0.8em; color: #666;">
+                        Notes: {{ recommendedBook.match_scores.notes_match | number:'1.0-1' }}%
+                        <br>
+                        Genre: {{ recommendedBook.match_scores.genre_match | number:'1.0-1' }}%
+                    </div>
+                </ng-container>
+                <ng-template #noScores>
+                    <!-- Add this to debug if match_scores is missing -->
+                    <span style="color: #666;">No match scores available</span>
+                </ng-template>
+            </div>
+        </div>
+        <p><strong>Title:</strong> {{ recommendedBook.title }}</p>
+        <p><strong>Author:</strong> {{ recommendedBook.author }}</p>
+        <p><strong>Genre:</strong> {{ recommendedBook.genre }}</p>
+        <p><strong>Description:</strong> {{ recommendedBook.description }}</p>
+        <p><a [href]="recommendedBook.url" target="_blank">View on Goodreads</a></p>
+    </div>
+
+    <div class="card playlist-card">
+        <h3>Recommended Playlist</h3>
+        <ul>
+            <li *ngFor="let song of recommendedPlaylist">
+                {{ song.song }} by {{ song.artist }} ({{ song.year }}) - {{ song.genre }}
+            </li>
+        </ul>
+    </div>
+</div>
+
+<ng-template #noRecommendation>
+    <p>No recommendation available at this moment.</p>
+</ng-template>

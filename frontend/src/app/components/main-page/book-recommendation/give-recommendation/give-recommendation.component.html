@@ -1,0 +1,32 @@
+<div class="body">
+    <div class="container">
+
+        <div class="form-box">
+            <h2 id="give-rec title"><i class="fas fa-book"></i>Give Recommendation</h2>
+            <label for="bookName">Book Name</label>
+            <input type="text" [(ngModel)]="bookName" placeholder="Book Name">
+
+            <label for="authorName">Author Name</label>
+            <input type="text" [(ngModel)]="authorName" placeholder="Author Name">
+
+            <label for="genre">Genre</label>
+            <input type="text" [(ngModel)]="genre" placeholder="Genre">
+
+            <label for="description">Description</label>
+            <textarea [(ngModel)]="description" rows="4" placeholder="Description"></textarea>
+
+            <div class="button-group">
+                <button class="back-btn" id="backFromGiveRec" (click)="goBack()">Back</button>
+                <button class="submit-btn" [ngClass]="{'submitted': isSubmitted}"
+                    (click)="submitGiveRec()">Submit</button>
+            </div>
+
+            <!-- <p *ngIf="submissionMessage">{{ submissionMessage }}</p> -->
+            <div *ngIf="isSubmitted" [ngClass]="{'alert-success': !isError, 'alert-danger': isError}"
+                class="alert message-container" role="alert">
+                {{ submissionMessage }}
+            </div>
+
+        </div>
+    </div>
+</div>

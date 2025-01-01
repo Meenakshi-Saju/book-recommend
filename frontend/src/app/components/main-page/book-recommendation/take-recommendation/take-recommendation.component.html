@@ -1,0 +1,5 @@
+<app-loading *ngIf="!recommendedBook"></app-loading>
+
+<!-- Show DisplayRecommendationComponent if recommendedBook has data -->
+<app-display *ngIf="recommendedBook" [recommendedBook]="recommendedBook" [recommendedPlaylist]="recommendedPlaylist">
+</app-display>

@@ -1,0 +1,10 @@
+<div class="main">
+
+    <div *ngIf="bookDetails" class="book-details">
+        <h3>Book Details</h3>
+        <p><strong>Title:</strong> {{ bookDetails.title }}</p>
+        <p><strong>Author:</strong> {{ bookDetails.author }}</p>
+        <p><strong>Description:</strong> {{ bookDetails.description }}</p>
+        <a *ngIf="bookDetails.url" [href]="bookDetails.url" target="_blank" class="goodreads-link">View on Goodreads</a>
+    </div>
+</div>

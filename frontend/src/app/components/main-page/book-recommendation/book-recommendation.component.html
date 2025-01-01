@@ -1,0 +1,17 @@
+<div class="body">
+    <div class="container">
+        <div class="search-container">
+            <input type="text" [(ngModel)]="searchQuery" placeholder="Enter book name..." class="search-input"
+                (keyup.enter)="searchBook()" />
+            <button class="search-btn" (click)="searchBook()">Search</button>
+        </div>
+
+        <div class="surrounder">
+            <h2><i class="fas fa-book"></i> Book Recommendation</h2>
+            <button class="option-btn" (click)="showGiveRecForm()">Give Recommendation</button>
+            <button class="option-btn" (click)="showTakeRecForm()">Take Recommendation</button>
+        </div>
+        <app-give-recommendation *ngIf="isGiveRecFormVisible"></app-give-recommendation>
+        <app-take-recommendation *ngIf="isTakeRecFormVisible"></app-take-recommendation>
+    </div>
+</div>

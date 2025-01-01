@@ -1,0 +1,25 @@
+<div class="container" style="
+    background-image: url('assets/images/library.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    ">
+    <div class=surrounding>
+        <h1>Writing Prompt Generator</h1>
+
+        <div class="prompt-box">
+            <p id="prompt">Choose a category to generate a prompt!</p>
+            <div>
+                <button class="fiction-button" (click)="generatePrompt('fiction')">Generate Fiction Prompt</button>
+                <button class="non-fiction-button" (click)="generatePrompt('nonFiction')">Generate Non-Fiction
+                    Prompt</button>
+            </div>
+        </div>
+
+        <div class="writing-box">
+            <textarea id="writingArea" placeholder="Start writing here..." [(ngModel)]="writingContent"></textarea>
+            <button class="download-button" (click)="downloadText()">Download Your Writing</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+<div class="container">
+    <div class="surrounder">
+        <header>
+            <h1>Popular Writing Podcasts & Video Series</h1>
+        </header>
+
+        <main class="resources-container">
+            <section class="podcast">
+                <h2>Podcasts</h2>
+                <ul>
+                    <li *ngFor="let podcast of podcasts">
+                        <a [href]="podcast.link" target="_blank">{{ podcast.title }}</a> - {{ podcast.description }}
+                    </li>
+                </ul>
+            </section>
+
+            <section class="video-series">
+                <h2>Video Series</h2>
+                <ul>
+                    <li *ngFor="let video of videos">
+                        <a [href]="video.link" target="_blank">{{ video.title }}</a> - {{ video.description }}
+                    </li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</div>

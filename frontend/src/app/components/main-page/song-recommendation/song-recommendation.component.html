@@ -1,0 +1,24 @@
+<div class="song-recommendation-container">
+    <h2 class="heading-animation">Find The Perfect Playlist For Your Book</h2>
+    <div class="input-box">
+        <input type="text" [(ngModel)]="bookTitle" placeholder="Enter a book title..." />
+        <button (click)="fetchPlaylist()" class="button-animation">Get Playlist</button>
+    </div>
+
+
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+    <!-- Playlist display -->
+    <div *ngIf="playlist.length > 0" class="playlist-container">
+        <h3>Recommended Playlist</h3>
+        <ul>
+            <li *ngFor="let song of playlist">
+                <strong>{{ song.song }}</strong> by {{ song.artist }} - {{ song.year }}
+                <p>Popularity: {{ song.popularity }} | Danceability: {{ song.danceability }} | Energy: {{ song.energy }}
+                </p>
+            </li>
+        </ul>
+    </div>
+
+
+</div>
