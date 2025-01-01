@@ -11,6 +11,8 @@ from threading import Lock
 import joblib
 import os
 
+
+
 # Global caches
 _model = None
 _embeddings_lock = Lock()
@@ -107,10 +109,32 @@ def get_user_info(username):
     return _user_cache[username]
 
 def calculate_genre_match(book_genres, preferred_genres):
-    """Calculate genre match percentage"""
-    book_genre_set = set(g.strip() for g in book_genres.split(','))
-    matching_genres = book_genre_set.intersection(preferred_genres)
-    return (len(matching_genres) / len(preferred_genres)) * 100
+    """Calculate genre match percentage with improved scoring"""
+    book_genre_set = set(g.strip().lower() for g in book_genres.split(','))
+    preferred_genres = set(g.lower() for g in preferred_genres)
+    
+    # Calculate both direct and partial matches
+    direct_matches = book_genre_set.intersection(preferred_genres)
+    
+    # Calculate partial matches (e.g., "fantasy" matches with "dark fantasy")
+    partial_matches = set()
+    for book_genre in book_genre_set:
+        for pref_genre in preferred_genres:
+            if (book_genre in pref_genre or pref_genre in book_genre) and \
+               book_genre != pref_genre and \
+               len(min(book_genre, pref_genre)) > 3:  # Avoid matching too short strings
+                partial_matches.add((book_genre, pref_genre))
+    
+    # Weight direct matches more heavily than partial matches
+    match_score = (len(direct_matches) * 1.0 + len(partial_matches) * 0.5)
+    max_possible_score = max(len(preferred_genres), len(book_genre_set))
+    
+    return min((match_score / max_possible_score) * 100, 100)  # Cap at 100%
+
+def normalize_score(score, min_threshold=40):
+    """Normalize scores to ensure a minimum threshold"""
+    return min_threshold + (100 - min_threshold) * (score / 100)
+
 
 def recommend_books_for_user(username, debug=False):
     if username not in users_df['User name'].values:
@@ -122,43 +146,53 @@ def recommend_books_for_user(username, debug=False):
     notes = user_info['notes']
     recommended_books = user_info['recommendations']
 
-    # Efficient genre filtering
-    genre_pattern = '|'.join(map(re.escape, preferred_genres))
-    genre_mask = books_df['Genres'].str.contains(genre_pattern, case=False, regex=True)
-    recommended_mask = ~books_df['Book'].isin(recommended_books)
-    filtered_books = books_df[genre_mask & recommended_mask]
-
-    if filtered_books.empty:
+    # Enhanced genre filtering with fuzzy matching
+    genre_matches = []
+    for book_idx, book_genres in enumerate(books_df['Genres']):
+        if pd.isna(book_genres):
+            continue
+        match_score = calculate_genre_match(book_genres, preferred_genres)
+        if match_score > 30:  # Lower threshold for initial filtering
+            genre_matches.append((book_idx, match_score))
+    
+    if not genre_matches:
         return {"error": f"No unrecommended books found for genres: {', '.join(preferred_genres)}."}
-
-    # Get user embedding from cache or compute
-    cache_key = hash(notes)
-    if not hasattr(recommend_books_for_user, '_embedding_cache'):
-        recommend_books_for_user._embedding_cache = {}
     
-    if cache_key not in recommend_books_for_user._embedding_cache:
-        keywords = extract_keywords_rake(notes)
-        keywords_str = ' '.join(keywords)
-        user_embedding = load_model().encode([keywords_str])
-        recommend_books_for_user._embedding_cache[cache_key] = user_embedding
-    else:
-        user_embedding = recommend_books_for_user._embedding_cache[cache_key]
-
-    # Efficient similarity computation
-    filtered_indices = filtered_books.index.values
-    filtered_embeddings = get_book_embeddings()[filtered_indices]
-    cosine_sim = cosine_similarity(user_embedding, filtered_embeddings)
-    most_similar_index = filtered_indices[cosine_sim.argmax()]
-    most_similar_book = books_df.iloc[most_similar_index]
-
-    # Calculate match percentages
-    notes_match = float(cosine_sim.max()) * 100  # Convert similarity to percentage
-    genre_match = calculate_genre_match(most_similar_book['Genres'], preferred_genres)
+    # Convert to filtered dataframe
+    matched_indices = [idx for idx, _ in genre_matches]
+    filtered_books = books_df.iloc[matched_indices].copy()
+    genre_scores = np.array([score for _, score in genre_matches])
     
-    # Calculate overall match (weighted average - you can adjust weights)
-    overall_match = (notes_match * 0.6 + genre_match * 0.4)  # 60% notes, 40% genre weight
+    # Remove already recommended books
+    mask = ~filtered_books['Book'].isin(recommended_books)
+    filtered_books = filtered_books[mask]
+    genre_scores = genre_scores[mask]
+    
+    if filtered_books.empty:
+        return {"error": "No unrecommended books found matching your preferences."}
 
-    # Update recommendations
+    # Enhanced text similarity calculation
+    user_embedding = load_model().encode([notes])
+    filtered_embeddings = get_book_embeddings()[filtered_books.index]
+    
+    # Calculate cosine similarity
+    cosine_sim = cosine_similarity(user_embedding, filtered_embeddings)[0]
+    
+    # Normalize similarity scores using numpy arrays instead of pandas Series
+    notes_scores = normalize_score(cosine_sim * 100)
+    genre_scores = normalize_score(genre_scores)
+    
+    # Calculate weighted final scores
+    final_scores = (
+        notes_scores * 0.6 +  # Increased weight for content matching
+        genre_scores * 0.4    # Genre matching weight
+    )
+    
+    # Get best match using numpy instead of pandas
+    best_match_idx = np.argmax(final_scores)
+    most_similar_book = filtered_books.iloc[best_match_idx]
+    
+    # Update recommendations and save
     new_book = most_similar_book['Book']
     if new_book not in recommended_books:
         recommended_books.add(new_book)
@@ -179,12 +213,13 @@ def recommend_books_for_user(username, debug=False):
             "description": most_similar_book['Description']
         },
         "match_scores": {
-            "overall_match": round(overall_match, 1),
-            "notes_match": round(notes_match, 1),
-            "genre_match": round(genre_match, 1)
+            "overall_match": round(float(final_scores[best_match_idx]), 1),
+            "notes_match": round(float(notes_scores[best_match_idx]), 1),
+            "genre_match": round(float(genre_scores[best_match_idx]), 1)
         },
         "playlist": playlist
     }
+
 
 @lru_cache(maxsize=64)
 def recommend_playlist_for_book(book_description):
