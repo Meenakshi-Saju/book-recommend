@@ -1,10 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
-interface GenreData {
-  genres: string[];
-  notes: string;
-}
+// interface GenreData {
+//   selectedGenres: string[];
+//   notes: string;
+// }
+
+
 
 @Component({
   selector: 'app-genres',
@@ -14,7 +19,10 @@ interface GenreData {
 export class GenresComponent implements OnInit {
   // Track selected genres and notes
   selectedGenres: string[] = [];
-  notesText: string = '';
+  notes: string = '';
+
+  constructor(private authService: AuthService, private userService: UserService, private router: Router) { }
+
 
   // List of available genres
   availableGenres = [
@@ -27,7 +35,7 @@ export class GenresComponent implements OnInit {
   ];
   username: any;
 
-  constructor(private http: HttpClient) { }
+  // constructor(private http: HttpClient) { }
 
   ngOnInit() {
     // Modal elements
@@ -92,29 +100,36 @@ export class GenresComponent implements OnInit {
     const notesTextarea = document.getElementById('notesText') as HTMLTextAreaElement;
     notesTextarea?.addEventListener('input', (e) => {
       const target = e.target as HTMLTextAreaElement;
-      this.notesText = target.value;
+      this.notes = target.value;
     });
   }
 
-  submitData(): void {
-    const data = {
-      username: this.username,  // Use the actual logged-in username here
+
+  savePreferences() {
+    const username = this.userService.getUsername();
+    if (!username) {
+      alert('No user logged in. Please register first.');
+      this.router.navigate(['/register']);
+      return;
+    }
+
+    this.authService.saveGenresAndNotes({
+      username: username,
       genres: this.selectedGenres,
-      notes: this.notesText
-    };
-
-    this.http.post('http://localhost:5000/update-genres-notes', data)
-      .subscribe({
-        next: (response) => {
-          console.log('Genres and notes updated successfully:', response);
-          alert('Your preferences have been saved!');
-        },
-        error: (error) => {
-          console.error('Error updating genres and notes:', error);
-          alert('Failed to save your preferences. Please try again.');
-        }
-      });
+      notes: this.notes,
+    }).subscribe(response => {
+      if (response.success) {
+        alert('Preferences saved successfully!');
+        this.router.navigate(['/main-page']);
+      } else {
+        alert('Failed to save preferences: ' + response.message);
+      }
+    }, error => {
+      console.error('Error saving preferences:', error);
+      alert('An error occurred. Please try again later.');
+    });
   }
-
-
 }
+
+
+

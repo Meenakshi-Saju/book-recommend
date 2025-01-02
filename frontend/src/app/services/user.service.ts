@@ -1,17 +1,28 @@
 
 import { Injectable } from '@angular/core';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
 })
 export class UserService {
-    private username: string | null = null;
+    private currentUser = new BehaviorSubject<string>('');
 
     setUsername(username: string) {
-        this.username = username;
+        this.currentUser.next(username);
+        localStorage.setItem('currentUser', username); // Persist user session
     }
 
-    getUsername(): string | null {
-        return this.username;
+    getUsername(): string {
+        return this.currentUser.getValue() || localStorage.getItem('currentUser') || '';
+    }
+
+    getUsernameObservable(): Observable<string> {
+        return this.currentUser.asObservable();
+    }
+
+    logout() {
+        this.currentUser.next('');
+        localStorage.removeItem('currentUser');
     }
 }

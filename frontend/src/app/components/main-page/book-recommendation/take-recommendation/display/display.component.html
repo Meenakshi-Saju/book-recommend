@@ -1,66 +1,80 @@
-<!-- <div class="real" *ngIf="recommendedBook && recommendedPlaylist.length > 0; else noRecommendation">
-    <div class="card book-card">
-        <h3>Recommended Book</h3>
-        <p><strong>Title:</strong> {{ recommendedBook.title }}</p>
-        <p><strong>Author:</strong> {{ recommendedBook.author }}</p>
-        <p><strong>Genre:</strong> {{ recommendedBook.genre }}</p>
-        <p><strong>Description:</strong> {{ recommendedBook.description }}</p>
-        <p><a [href]="recommendedBook.url" target="_blank">View on Goodreads</a></p>
-    </div>
-
-    <div class="card playlist-card">
-        <h3>Recommended Playlist</h3>
-        <ul>
-            <li *ngFor="let song of recommendedPlaylist">
-                {{ song.song }} by {{ song.artist }} ({{ song.year }}) - {{ song.genre }}
-            </li>
-        </ul>
-    </div>
-</div>
-
-<ng-template #noRecommendation>
-    <p>No recommendation available at this moment.</p>
-</ng-template> -->
-
 <div class="real" *ngIf="recommendedBook && recommendedPlaylist.length > 0; else noRecommendation">
     <div class="card book-card">
-        <div class="heading-container" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="heading-container">
             <h3>Recommended Book</h3>
-            <div class="match-scores" style="text-align: right;">
-                <!-- Add *ngIf to check if match_scores exists -->
-                <ng-container *ngIf="recommendedBook.match_scores; else noScores">
-                    <span class="overall-match" style="font-weight: bold; color: #4CAF50;">
-                        {{ recommendedBook.match_scores.overall_match | number:'1.0-1' }}% Match
-                    </span>
-                    <div class="detailed-scores" style="font-size: 0.8em; color: #666;">
-                        Notes: {{ recommendedBook.match_scores.notes_match | number:'1.0-1' }}%
-                        <br>
-                        Genre: {{ recommendedBook.match_scores.genre_match | number:'1.0-1' }}%
+            <div class="match-scores" *ngIf="recommendedBook.match_scores">
+                <div class="overall-match">
+                    <span class="score">{{ recommendedBook.match_scores.overall_match | number:'1.0-1' }}%</span>
+                    <span class="label">Overall Match</span>
+                </div>
+                <div class="detailed-scores">
+                    <div class="score-item">
+                        <span class="label">Content Match:</span>
+                        <span class="score">{{ recommendedBook.match_scores.notes_match | number:'1.0-1' }}%</span>
                     </div>
-                </ng-container>
-                <ng-template #noScores>
-                    <!-- Add this to debug if match_scores is missing -->
-                    <span style="color: #666;">No match scores available</span>
-                </ng-template>
+                    <div class="score-item">
+                        <span class="label">Genre Match:</span>
+                        <span class="score">{{ recommendedBook.match_scores.genre_match | number:'1.0-1' }}%</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="label">Feedback Match:</span>
+                        <span class="score">{{ recommendedBook.match_scores.feedback_match | number:'1.0-1' }}%</span>
+                    </div>
+                </div>
             </div>
         </div>
-        <p><strong>Title:</strong> {{ recommendedBook.title }}</p>
-        <p><strong>Author:</strong> {{ recommendedBook.author }}</p>
-        <p><strong>Genre:</strong> {{ recommendedBook.genre }}</p>
-        <p><strong>Description:</strong> {{ recommendedBook.description }}</p>
-        <p><a [href]="recommendedBook.url" target="_blank">View on Goodreads</a></p>
+
+        <div class="book-content">
+            <div class="book-header">
+                <h4>{{ recommendedBook.title }}</h4>
+                <span class="author">by {{ recommendedBook.author }}</span>
+            </div>
+            <div class="book-details">
+                <p class="genre"><strong>Genre:</strong> {{ recommendedBook.genre }}</p>
+                <p class="description">{{ recommendedBook.description }}</p>
+                <a [href]="recommendedBook.url" target="_blank" class="goodreads-link"
+                    (click)="toggleFeedback('clicked')">
+                    View on Goodreads
+                </a>
+            </div>
+        </div>
+
+        <div class="feedback-buttons">
+            <button class="feedback-btn" [class.active]="feedbackState.liked" (click)="toggleFeedback('liked')"
+                [disabled]="!username" title="Like this book">
+                <i class="fas fa-heart"></i>
+                <span class="feedback-label">Like</span>
+            </button>
+            <button class="feedback-btn" [class.active]="feedbackState.saved" (click)="toggleFeedback('saved')"
+                [disabled]="!username" title="Save for later">
+                <i class="fas fa-bookmark"></i>
+                <span class="feedback-label">Save</span>
+            </button>
+            <button class="feedback-btn" [class.active]="feedbackState.shared" (click)="shareBook()"
+                [disabled]="!username" title="Share this book">
+                <i class="fas fa-share-alt"></i>
+                <span class="feedback-label">Share</span>
+            </button>
+        </div>
     </div>
 
     <div class="card playlist-card">
         <h3>Recommended Playlist</h3>
-        <ul>
-            <li *ngFor="let song of recommendedPlaylist">
-                {{ song.song }} by {{ song.artist }} ({{ song.year }}) - {{ song.genre }}
+        <ul class="playlist">
+            <li *ngFor="let song of recommendedPlaylist" class="song-item">
+                <div class="song-details">
+                    <span class="song-title">{{ song.song }}</span>
+                    <span class="song-artist">{{ song.artist }}</span>
+                    <span class="song-year">({{ song.year }})</span>
+                    <span class="song-genre">{{ song.genre }}</span>
+                </div>
             </li>
         </ul>
     </div>
 </div>
 
 <ng-template #noRecommendation>
-    <p>No recommendation available at this moment.</p>
+    <div class="no-recommendation">
+        <p>No recommendations available at this moment. Please ensure your preferences are set and try again.</p>
+    </div>
 </ng-template>

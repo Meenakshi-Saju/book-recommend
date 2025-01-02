@@ -13,6 +13,7 @@ interface Book {
         overall_match: number;
         notes_match: number;
         genre_match: number;
+        feedback_match: number;
     };
 }
 
@@ -35,6 +36,7 @@ interface RecommendationResponse {
             overall_match: number;
             notes_match: number;
             genre_match: number;
+            feedback_match: number;
         };
     };
     message?: string;

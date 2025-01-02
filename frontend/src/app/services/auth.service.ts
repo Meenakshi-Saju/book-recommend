@@ -55,6 +55,12 @@ interface LoginData {
     password: string;
 }
 
+interface PreferencesData {
+    username: string;
+    genres: string[];
+    notes: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -90,4 +96,12 @@ export class AuthService {
             })
         );
     }
+    saveGenresAndNotes(data: PreferencesData): Observable<any> {
+        const url = `${this.baseUrl}/save-preferences`;
+        return this.http.post(url, data, {
+            headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+        });
+    }
+
+
 }

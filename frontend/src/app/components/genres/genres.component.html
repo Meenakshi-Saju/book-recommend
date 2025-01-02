@@ -30,7 +30,7 @@
             <label *ngFor="let genre of availableGenres">
               <input type="checkbox" [value]="genre" /> {{ genre }}
             </label>
-            <button (click)="submitData()" class="submit-button">Submit</button>
+            <button (click)="savePreferences()" class="submit-button">Submit</button>
           </div>
         </div>
       </div>
@@ -40,7 +40,7 @@
           <span class="close-button" id="closeNotesModal">X</span>
           <h2>Add Notes</h2>
           <textarea id="notesText" placeholder="Enter your notes here..."></textarea>
-          <button (click)="submitData()" class="submit-button">Submit</button>
+          <button (click)="savePreferences()" class="submit-button">Submit</button>
         </div>
       </div>
 
