@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import csv
 import pandas as pd
 import requests
@@ -15,9 +15,17 @@ logger = logging.getLogger(__name__)
 class BookRecommenderApp:
     def __init__(self):
         self.app = Flask(__name__)
-        CORS(self.app)
+        CORS(self.app, resources={
+        r"/*": {
+            "origins": ["http://localhost:4200"],  # Your Angular app URL
+            "methods": ["GET", "POST", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
+        }
+    })
         self.recommender = HybridRecommender()
         self.setup_routes()
+        # self.app.after_request(self.after_request)
 
         # CSV file paths
         self.CSV_FILE_USER = 'User.csv'
@@ -48,6 +56,12 @@ class BookRecommenderApp:
         self.app.route('/update-genres-notes', methods=['POST'])(self.update_genres_notes)
         self.app.route('/register', methods=['POST'])(self.register)
         self.app.route('/login', methods=['POST'])(self.login)
+
+    def after_request(self, response):
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:4200')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        return response
 
     def get_user_interactions(self):
         username = request.args.get('username')
@@ -187,60 +201,78 @@ class BookRecommenderApp:
         except FileNotFoundError:
             return jsonify({"success": False, "message": "Book data file not found."}), 500
 
+    
+    
     def update_genres_notes(self):
+        if request.method == 'OPTIONS':
+            return jsonify({}), 200
+            
         data = request.get_json()
         username = data.get('username')
         genres = ', '.join(data.get('genres', [])) if data.get('genres') else 'No genres specified'
         notes = data.get('notes', 'No notes provided')
 
-        updated = False
-
         try:
             with open(self.CSV_FILE_USER, mode='r') as file:
                 reader = csv.reader(file)
                 rows = list(reader)
 
+            user_found = False
             for row in rows:
                 if row[1] == username:
                     row[3] = genres
                     row[4] = notes
-                    updated = True
+                    user_found = True
                     break
+
+            if not user_found:
+                return jsonify({"success": False, "message": "User not found"}), 404
 
             with open(self.CSV_FILE_USER, mode='w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerows(rows)
 
-        except FileNotFoundError:
-            return jsonify({"success": False, "message": "User database not found."}), 404
+            return jsonify({"success": True, "message": "Preferences updated successfuly!"}), 200
 
-        if updated:
-            return jsonify({"success": True, "message": "Genres and notes updated successfully!"}), 200
-        else:
-            return jsonify({"success": False, "message": "Username not found."}), 404
+        except Exception as e:
+            logger.error(f"Update preferences error: {str(e)}", exc_info=True)
+            return jsonify({"success": False, "message": "Failed to update preferences"}), 500
+        
 
     def register(self):
+        if request.method == 'OPTIONS':
+            return jsonify({}), 200
+            
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
 
+        if not username or not password:
+            return jsonify({"success": False, "message": "Username and password are required"}), 400
+
         try:
             with open(self.CSV_FILE_USER, mode='r') as file:
                 reader = csv.reader(file)
-                next(reader)
+                next(reader)  # Skip header
                 rows = list(reader)
                 last_sno = int(rows[-1][0]) if rows else 0
-        except FileNotFoundError:
-            last_sno = 0
 
-        new_sno = last_sno + 1
-        with open(self.CSV_FILE_USER, mode='a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([new_sno, username, password, '', ''])
+            new_sno = last_sno + 1
+            with open(self.CSV_FILE_USER, mode='a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([new_sno, username, password, '', ''])
 
-        return jsonify({"success": True, "message": "Registration successful!"}), 201
+            return jsonify({"success": True, "message": "Registration successful!"}), 201
+
+        except Exception as e:
+            logger.error(f"Registration error: {str(e)}", exc_info=True)
+            return jsonify({"success": False, "message": "Registration failed"}), 500
+        
 
     def login(self):
+        if request.method == 'OPTIONS':
+            return jsonify({}), 200
+        
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
@@ -248,14 +280,24 @@ class BookRecommenderApp:
         try:
             with open(self.CSV_FILE_USER, mode='r') as file:
                 reader = csv.reader(file)
-                next(reader)
+                next(reader)  # Skip header
                 for row in reader:
                     if row[1] == username and row[2] == password:
                         return jsonify({"success": True, "message": "Login successful!"}), 200
-        except FileNotFoundError:
-            return jsonify({"success": False, "message": "User data file not found."}), 500
 
-        return jsonify({"success": False, "message": "Invalid username or password."}), 401
+            return jsonify({"success": False, "message": "Invalid username or password"}), 401
+
+        except Exception as e:
+            logger.error(f"Login error: {str(e)}", exc_info=True)
+            return jsonify({"success": False, "message": "Login failed"}), 500
+
+        
+
+
+    
+    
+
+    
 
 # Create the application instance
 app_instance = BookRecommenderApp()

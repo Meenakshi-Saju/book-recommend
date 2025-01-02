@@ -1,40 +1,3 @@
-// import { Injectable } from '@angular/core';
-// import { HttpClient, HttpHeaders } from '@angular/common/http';
-// import { Observable } from 'rxjs';
-
-// interface RegisterData {
-//     username: string;
-//     password: string;
-//     genres: string[];
-//     notes: string;
-// }
-
-// interface LoginData {
-//     username: string;
-//     password: string;
-// }
-
-// @Injectable({
-//     providedIn: 'root'
-// })
-// export class AuthService {
-//     private baseUrl = 'http://localhost:5000';  // Flask API base URL
-
-//     constructor(private http: HttpClient) { }
-
-//     registerUser(data: RegisterData): Observable<any> {
-//         const url = `${this.baseUrl}/register`;
-//         return this.http.post(url, data, {
-//             headers: new HttpHeaders({
-//                 'Content-Type': 'application/json'
-//             })
-//         });
-//     }
-
-//     loginUser(credentials: { username: string, password: string }): Observable<any> {
-//         return this.http.post(`${this.baseUrl}/login`, credentials);
-//     }
-// }
 
 
 
@@ -97,7 +60,7 @@ export class AuthService {
         );
     }
     saveGenresAndNotes(data: PreferencesData): Observable<any> {
-        const url = `${this.baseUrl}/save-preferences`;
+        const url = `${this.baseUrl}/update-genres-notes`; // Changed from update-genre-notes
         return this.http.post(url, data, {
             headers: new HttpHeaders({ 'Content-Type': 'application/json' })
         });

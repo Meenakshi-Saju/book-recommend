@@ -27,9 +27,11 @@
           <span class="close-button" id="closeGenreModal">X</span>
           <h2>Select Genre Options</h2>
           <div class="checkbox-group">
-            <label *ngFor="let genre of availableGenres">
-              <input type="checkbox" [value]="genre" /> {{ genre }}
-            </label>
+            <div *ngFor="let genre of availableGenres">
+              <label>
+                <input type="checkbox" [value]="genre" (change)="onGenreChange($event, genre)" /> {{ genre }}
+              </label>
+            </div>
             <button (click)="savePreferences()" class="submit-button">Submit</button>
           </div>
         </div>
@@ -39,7 +41,7 @@
         <div class="modal-content">
           <span class="close-button" id="closeNotesModal">X</span>
           <h2>Add Notes</h2>
-          <textarea id="notesText" placeholder="Enter your notes here..."></textarea>
+          <textarea id="notesText" [(ngModel)]="notes" placeholder="Enter your notes here..."></textarea>
           <button (click)="savePreferences()" class="submit-button">Submit</button>
         </div>
       </div>

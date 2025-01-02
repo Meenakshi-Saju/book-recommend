@@ -79,7 +79,7 @@ export class LoginComponent implements AfterViewInit {
             if (response.success) {
                 this.userService.setUsername(this.username);  // Store username in UserService
                 alert('Registration successful!');
-                this.router.navigate(['/main-page']);
+                this.router.navigate(['/genres']);
             } else {
                 alert('Registration failed: ' + response.message);
             }

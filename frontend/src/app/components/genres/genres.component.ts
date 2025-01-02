@@ -4,10 +4,11 @@ import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 
-// interface GenreData {
-//   selectedGenres: string[];
-//   notes: string;
-// }
+interface PreferencesData {
+  username: string;
+  genres: string[];
+  notes: string;
+}
 
 
 
@@ -21,7 +22,7 @@ export class GenresComponent implements OnInit {
   selectedGenres: string[] = [];
   notes: string = '';
 
-  constructor(private authService: AuthService, private userService: UserService, private router: Router) { }
+  constructor(private authService: AuthService, private userService: UserService, private router: Router) { this.username = this.userService.getUsername(); }
 
 
   // List of available genres
@@ -39,6 +40,8 @@ export class GenresComponent implements OnInit {
 
   ngOnInit() {
     // Modal elements
+
+
     const genreText = document.getElementById('genreText');
     const genreModal = document.getElementById('genreModal')!;
     const closeGenreModal = document.getElementById('closeGenreModal')!;
@@ -75,58 +78,44 @@ export class GenresComponent implements OnInit {
     });
 
     // Set up checkbox handlers
-    this.setupCheckboxHandlers();
+    // this.setupCheckboxHandlers();
 
     // Set up notes handler
-    this.setupNotesHandler();
+    // this.setupNotesHandler();
   }
 
-  private setupCheckboxHandlers(): void {
-    const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
-    checkboxes.forEach((checkbox: Element) => {
-      (checkbox as HTMLInputElement).addEventListener('change', (e) => {
-        const target = e.target as HTMLInputElement;
-        if (target.checked) {
-          this.selectedGenres.push(target.parentElement?.textContent?.trim() || '');
-        } else {
-          const genre = target.parentElement?.textContent?.trim() || '';
-          this.selectedGenres = this.selectedGenres.filter(g => g !== genre);
-        }
-      });
-    });
+  onGenreChange(event: any, genre: string) {
+    if (event.target.checked) {
+      this.selectedGenres.push(genre);
+    } else {
+      this.selectedGenres = this.selectedGenres.filter(g => g !== genre);
+    }
+    console.log('Selected genres:', this.selectedGenres);
   }
-
-  private setupNotesHandler(): void {
-    const notesTextarea = document.getElementById('notesText') as HTMLTextAreaElement;
-    notesTextarea?.addEventListener('input', (e) => {
-      const target = e.target as HTMLTextAreaElement;
-      this.notes = target.value;
-    });
-  }
-
 
   savePreferences() {
     const username = this.userService.getUsername();
     if (!username) {
-      alert('No user logged in. Please register first.');
-      this.router.navigate(['/register']);
+      alert('Please log in first');
       return;
     }
 
-    this.authService.saveGenresAndNotes({
-      username: username,
+    const data = {
+      username,
       genres: this.selectedGenres,
-      notes: this.notes,
-    }).subscribe(response => {
-      if (response.success) {
-        alert('Preferences saved successfully!');
-        this.router.navigate(['/main-page']);
-      } else {
-        alert('Failed to save preferences: ' + response.message);
-      }
-    }, error => {
-      console.error('Error saving preferences:', error);
-      alert('An error occurred. Please try again later.');
+      notes: this.notes
+    };
+
+    console.log('Sending data:', data);
+
+    this.authService.saveGenresAndNotes(data).subscribe({
+      next: (response) => {
+        if (response.success) {
+          alert('Preferences saved!');
+          this.router.navigate(['/main-page']);
+        }
+      },
+      error: (err) => console.error('Error:', err)
     });
   }
 }
