@@ -32,7 +32,8 @@
                 <input type="checkbox" [value]="genre" (change)="onGenreChange($event, genre)" /> {{ genre }}
               </label>
             </div>
-            <button (click)="savePreferences()" class="submit-button">Submit</button>
+            <button (click)="savePreferences('genres')" class="submit-button">Save Genres</button>
+
           </div>
         </div>
       </div>
@@ -42,7 +43,9 @@
           <span class="close-button" id="closeNotesModal">X</span>
           <h2>Add Notes</h2>
           <textarea id="notesText" [(ngModel)]="notes" placeholder="Enter your notes here..."></textarea>
-          <button (click)="savePreferences()" class="submit-button">Submit</button>
+          <button (click)="savePreferences('notes')" class="submit-button">Save Notes</button>
+
+
         </div>
       </div>
 

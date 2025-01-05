@@ -1,4 +1,5 @@
-<div class="real" *ngIf="recommendedBook && recommendedPlaylist.length > 0; else noRecommendation">
+<div class="real"
+    *ngIf="recommendedBook && recommendedPlaylist && recommendedPlaylist.length > 0; else noRecommendation">
     <div class="card book-card">
         <div class="heading-container">
             <h3>Recommended Book</h3>

@@ -1,19 +1,82 @@
-<div class="container">
-    <!-- Analog Clock Section -->
-    <app-clock></app-clock>
+<body>
+    <button class="genres-button" (click)="navigateTo('/genres')">
+        <span class="button-text">Update Preferences</span>
+        <span class="button-icon">⚙️</span>
+    </button>
 
-    <h1>Welcome!</h1>
+    <canvas id="game"></canvas>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,700,300" rel="stylesheet">
 
-    <a routerLink="/book-recommendation" class="button books-button" id="books-button">
-        <img src="/assets/images/Book.png" alt="Books">
-        <span>Books</span>
-    </a>
-    <a routerLink="/song-recommendation" class="button music-button">
-        <img src="/assets/images/Music.png" alt="Music">
-        <span>Music</span>
-    </a>
-    <a routerLink="/writing-section" class="button writers-section-button">
-        <img src="/assets/images/Letter Quill.png" alt="Writers Section">
-        <span>Writers Section</span>
-    </a>
-</div>
+    <h1 style="font-family: helvetica neue">
+        Where do you wanna go?
+    </h1>
+    <div class="cloud cloud_1"></div>
+    <div class="cloud cloud_2"></div>
+    <div class="cloud cloud_3"></div>
+
+    <div class="page">
+        <!-- <div class="content">
+            <div class="circle" (click)="navigateTo('/song-recommendation')">
+                <div class="circle_title">
+                    <h2>Music</h2>
+                    <h3>Get a song for your book</h3>
+                </div>
+                <div class="circle_inner">
+                    <div class="circle_inner__layer">
+                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/217233/pc1.png"
+                            alt="Great Outdoors Image 1">
+                    </div>
+                    <div class="circle_inner__layer">
+                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/217233/pc3.png"
+                            alt="Great Outdoors Image 2">
+                    </div>
+                    <div class="circle_inner__layer_1">
+                        <img src="/assets/images/Music.png" alt="Music">
+                    </div>
+                </div>
+                <div class="content_shadow"></div>
+            </div>
+        </div> -->
+
+        <div class="content">
+            <div class="circle" (click)="navigateTo('book-recommendation')">
+                <div class="circle_title">
+                    <h2>Books</h2>
+                    <h3>Get a book or give a book</h3>
+                </div>
+                <div class="circle_inner">
+                    <div class="circle_inner__layer">
+                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/217233/pc4.png" alt="City Breaks Image">
+                    </div>
+                    <div class="circle_inner__layer_1">
+                        <img src="/assets/images/Book.png" alt="Books">
+                    </div>
+                </div>
+                <div class="content_shadow"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="circle" (click)="navigateTo('writing-section')">
+                <div class="circle_title">
+                    <h2>Writers</h2>
+                    <h3>A small aid for Writers</h3>
+                </div>
+                <div class="circle_inner">
+                    <div class="circle_inner__layer">
+                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/217233/pc7.png"
+                            alt="Cheap Flights Image 1">
+                    </div>
+                    <div class="circle_inner__layer">
+                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/217233/pc8.png"
+                            alt="Cheap Flights Image 2">
+                    </div>
+                    <div class="circle_inner__layer_1">
+                        <img src="/assets/images/Letter Quill.png" alt="Writers Section">
+                    </div>
+                </div>
+                <div class="content_shadow"></div>
+            </div>
+        </div>
+    </div>
+</body>

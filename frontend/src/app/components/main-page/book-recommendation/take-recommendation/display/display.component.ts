@@ -43,9 +43,15 @@ export class DisplayComponent implements OnChanges {
         private userService: UserService
     ) { }
     ngOnChanges(changes: SimpleChanges): void {
+        // Handle changes to recommendedBook
         if (changes['recommendedBook'] && this.recommendedBook && this.username) {
             console.log('Book changed, loading feedback');
             this.loadExistingFeedback();
+        }
+
+        // Log changes to recommendedPlaylist
+        if (changes['recommendedPlaylist']) {
+            console.log('Playlist changed:', this.recommendedPlaylist);
         }
     }
 

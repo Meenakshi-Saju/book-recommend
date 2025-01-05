@@ -17,15 +17,12 @@ interface PreferencesData {
   templateUrl: './genres.component.html',
   styleUrls: ['./genres.component.scss']
 })
+
 export class GenresComponent implements OnInit {
-  // Track selected genres and notes
   selectedGenres: string[] = [];
   notes: string = '';
+  username: string;
 
-  constructor(private authService: AuthService, private userService: UserService, private router: Router) { this.username = this.userService.getUsername(); }
-
-
-  // List of available genres
   availableGenres = [
     'Fiction',
     'Non Fiction',
@@ -34,21 +31,56 @@ export class GenresComponent implements OnInit {
     'Romance',
     'Young Adult'
   ];
-  username: any;
 
-  // constructor(private http: HttpClient) { }
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+    private router: Router
+  ) {
+    this.username = this.userService.getUsername();
+  }
 
   ngOnInit() {
-    // Modal elements
+    // Fetch existing preferences when component loads
+    this.fetchUserPreferences();
+    this.setupModalHandlers();
+  }
 
+  private fetchUserPreferences() {
+    const username = this.userService.getUsername();
+    if (username) {
+      // Add this method to your AuthService
+      this.authService.getUserPreferences(username).subscribe({
+        next: (response: any) => {
+          if (response.success) {
+            this.selectedGenres = response.data.genres || [];
+            this.notes = response.data.notes || '';
+            // Update checkboxes
+            this.updateCheckboxes();
+          }
+        },
+        error: (err) => console.error('Error fetching preferences:', err)
+      });
+    }
+  }
 
+  private updateCheckboxes() {
+    // Update checkbox states based on selectedGenres
+    this.availableGenres.forEach(genre => {
+      const checkbox = document.querySelector(`input[value="${genre}"]`) as HTMLInputElement;
+      if (checkbox) {
+        checkbox.checked = this.selectedGenres.includes(genre);
+      }
+    });
+  }
+
+  private setupModalHandlers() {
     const genreText = document.getElementById('genreText');
     const genreModal = document.getElementById('genreModal')!;
-    const closeGenreModal = document.getElementById('closeGenreModal')!;
     const notesModal = document.getElementById('notesModal')!;
+    const closeGenreModal = document.getElementById('closeGenreModal')!;
     const closeNotesModal = document.getElementById('closeNotesModal')!;
 
-    // Genre click handler
     genreText?.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       if (target.id === 'genre') {
@@ -58,30 +90,13 @@ export class GenresComponent implements OnInit {
       }
     });
 
-    // Close button handlers
-    closeGenreModal?.addEventListener('click', () => {
+    closeGenreModal.addEventListener('click', () => {
       genreModal.style.display = 'none';
     });
 
-    closeNotesModal?.addEventListener('click', () => {
+    closeNotesModal.addEventListener('click', () => {
       notesModal.style.display = 'none';
     });
-
-    // Close on outside click
-    window.addEventListener('click', (e) => {
-      if (e.target === genreModal) {
-        genreModal.style.display = 'none';
-      }
-      if (e.target === notesModal) {
-        notesModal.style.display = 'none';
-      }
-    });
-
-    // Set up checkbox handlers
-    // this.setupCheckboxHandlers();
-
-    // Set up notes handler
-    // this.setupNotesHandler();
   }
 
   onGenreChange(event: any, genre: string) {
@@ -90,10 +105,9 @@ export class GenresComponent implements OnInit {
     } else {
       this.selectedGenres = this.selectedGenres.filter(g => g !== genre);
     }
-    console.log('Selected genres:', this.selectedGenres);
   }
 
-  savePreferences() {
+  savePreferences(modalType: 'genres' | 'notes') {
     const username = this.userService.getUsername();
     if (!username) {
       alert('Please log in first');
@@ -106,19 +120,18 @@ export class GenresComponent implements OnInit {
       notes: this.notes
     };
 
-    console.log('Sending data:', data);
-
     this.authService.saveGenresAndNotes(data).subscribe({
       next: (response) => {
         if (response.success) {
           alert('Preferences saved!');
-          this.router.navigate(['/main-page']);
+          // Close only the current modal
+          const modal = document.getElementById(modalType === 'genres' ? 'genreModal' : 'notesModal');
+          if (modal) {
+            modal.style.display = 'none';
+          }
         }
       },
       error: (err) => console.error('Error:', err)
     });
   }
 }
-
-
-

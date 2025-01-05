@@ -35,19 +35,27 @@ class BookRecommenderApp:
         self.initialize_csv_files()
 
     def initialize_csv_files(self):
-        """Ensure necessary CSV files exist with appropriate headers."""
-        if not os.path.exists(self.CSV_FILE_USER):
-            with open(self.CSV_FILE_USER, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(['SNo', 'User name', 'PassWord', 'Preferred Genres', 'Notes', 'Recommended Books'])
+        """Enhanced CSV initialization with error handling"""
+        try:
+            if not os.path.exists(self.CSV_FILE_USER):
+                logger.info("Creating new user CSV file")
+                with open(self.CSV_FILE_USER, 'w', newline='', encoding='utf-8') as file:
+                    writer = csv.writer(file)
+                    writer.writerow(['SNo', 'User name', 'PassWord', 'Genre', 'Notes', 'Recommended Books'])
 
-        if not os.path.exists(self.CSV_FILE_BOOKS):
-            with open(self.CSV_FILE_BOOKS, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(['SNo', 'Book', 'Author', 'Description', 'Genres', 'Avg_Rating', 'Num_Ratings', 'URL'])
+            if not os.path.exists(self.CSV_FILE_BOOKS):
+                logger.info("Creating new books CSV file")
+                with open(self.CSV_FILE_BOOKS, 'w', newline='', encoding='utf-8') as file:
+                    writer = csv.writer(file)
+                    writer.writerow(['SNo', 'Book', 'Author', 'Description', 'Genres', 'Avg_Rating', 'Num_Ratings', 'URL'])
+
+        except Exception as e:
+            logger.error(f"Error initializing CSV files: {str(e)}", exc_info=True)
+            raise
 
     def setup_routes(self):
         # Routes for user interactions and feedback
+        self.app.route('/get-user-preferences/<username>', methods=['GET'])(self.get_user_preferences)
         self.app.route('/book-feedback', methods=['POST'])(self.book_feedback)
         self.app.route('/get-user-interactions', methods=['GET'])(self.get_user_interactions)
         self.app.route('/recommend', methods=['POST'])(self.recommend)
@@ -56,29 +64,80 @@ class BookRecommenderApp:
         self.app.route('/update-genres-notes', methods=['POST'])(self.update_genres_notes)
         self.app.route('/register', methods=['POST'])(self.register)
         self.app.route('/login', methods=['POST'])(self.login)
+        self.app.route('/song-recommendation', methods=['POST'])(self.login)
+        # self.app.route('/song-recommendation', methods=['POST', 'OPTIONS'])(self.get_song_recommendations)
+    
+    def get_playlist(self):
+        print("Processing playlist request")
+        data = request.get_json()
+        book_title = data.get('book')  
+    
+        if not book_title:
+            return jsonify({"success": False, "message": "Book title is required"}), 400
+
+        playlist = self.recommender.get_playlist(book_title)
+    
+        if not playlist:
+            return jsonify({"success": False, "message": "Book not found in database."}), 404
+
+        return jsonify({"success": True, "data": playlist}), 200
+
+    def get_user_preferences(self, username):
+        try:
+            with open(self.CSV_FILE_USER, mode='r') as file:
+                reader = csv.reader(file)
+                next(reader)  # Skip header
+                for row in reader:
+                    if row[1] == username:
+                        return jsonify({
+                        "success": True,
+                        "data": {
+                            "genres": row[3].split(', ') if row[3] else [],
+                            "notes": row[4]
+                        }
+                    }), 200
+            return jsonify({"success": False, "message": "User not found"}), 404
+        except Exception as e:
+            logger.error(f"Error getting user preferences: {str(e)}", exc_info=True)
+            return jsonify({"success": False, "message": "Failed to get preferences"}), 500
+    
 
     def after_request(self, response):
         response.headers.add('Access-Control-Allow-Origin', 'http://localhost:4200')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
         response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
         return response
+    
+
 
     def get_user_interactions(self):
-        username = request.args.get('username')
-        book_title = request.args.get('bookTitle')
-
-        logger.info(f"Getting interactions for user: {username}, book: {book_title}")
-
-        if not username:
-            return jsonify({"success": False, "message": "Username is required"}), 400
-
+        """Enhanced user interactions endpoint"""
         try:
+            username = request.args.get('username')
+            book_title = request.args.get('bookTitle')
+
+            logger.info(f"Getting interactions for user: {username}, book: {book_title}")
+
+            if not username or not book_title:
+                return jsonify({
+                    "success": False,
+                    "message": "Both username and bookTitle are required"
+                }), 400
+
             feedback = self.recommender.get_user_feedback_score(username, book_title)
             logger.info(f"Retrieved feedback: {feedback}")
-            return jsonify({"success": True, "data": feedback}), 200
+            
+            return jsonify({
+                "success": True,
+                "data": feedback
+            }), 200
+
         except Exception as e:
             logger.error(f"Error getting user interactions: {str(e)}", exc_info=True)
-            return jsonify({"success": False, "message": f"Error retrieving interactions: {str(e)}"}), 500
+            return jsonify({
+                "success": False,
+                "message": f"Error retrieving interactions: {str(e)}"
+            }), 500
 
     def book_feedback(self):
         logger.info("=== Book Feedback Route Started ===")
@@ -104,16 +163,77 @@ class BookRecommenderApp:
             return jsonify({"success": False, "message": f"Error recording feedback: {str(e)}"}), 500
 
     def recommend(self):
-        data = request.get_json()
-        username = data.get('username')
-        logger.info(f"Getting recommendation for user: {username}")
-
+        """Enhanced recommendation endpoint with better error handling and logging"""
         try:
-            result = self.recommender.recommend_books_for_user(username, debug=True)
-            return jsonify({"success": True, "data": result}), 200
+            data = request.get_json()
+            username = data.get('username')
+            
+            if not username:
+                logger.error("No username provided in recommendation request")
+                return jsonify({
+                    "success": False,
+                    "message": "Username is required"
+                }), 400
+
+            logger.info(f"Getting recommendation for user: {username}")
+            logger.info(f"Request payload: {data}")
+
+            # Check if user exists first
+            user_exists = False
+            with open(self.CSV_FILE_USER, mode='r') as file:
+                reader = csv.reader(file)
+                next(reader)  # Skip header
+                for row in reader:
+                    if row[1] == username:
+                        user_exists = True
+                        break
+
+            if not user_exists:
+                logger.error(f"User {username} not found in database")
+                return jsonify({
+                    "success": False,
+                    "message": f"User {username} not found"
+                }), 404
+
+            # Get recommendation with detailed error catching
+            try:
+                result = self.recommender.recommend_books_for_user(username, debug=True)
+                
+                if not result:
+                    logger.error(f"No recommendation generated for user: {username}")
+                    return jsonify({
+                        "success": False,
+                        "message": "No recommendations available"
+                    }), 404
+
+                if "error" in result:
+                    logger.error(f"Recommendation error for user {username}: {result['error']}")
+                    return jsonify({
+                        "success": False,
+                        "message": result["error"]
+                    }), 404
+
+                logger.info(f"Successfully generated recommendation for user {username}")
+                logger.info(f"Recommendation result: {result}")
+                
+                return jsonify({
+                    "success": True,
+                    "data": result
+                }), 200
+
+            except Exception as rec_error:
+                logger.error(f"Recommendation generation error: {str(rec_error)}", exc_info=True)
+                return jsonify({
+                    "success": False,
+                    "message": f"Failed to generate recommendation: {str(rec_error)}"
+                }), 500
+
         except Exception as e:
-            logger.error(f"Error in recommend: {str(e)}", exc_info=True)
-            return jsonify({"success": False, "message": f"Error getting recommendation: {str(e)}"}), 500
+            logger.error(f"General recommendation endpoint error: {str(e)}", exc_info=True)
+            return jsonify({
+                "success": False,
+                "message": f"Error processing recommendation request: {str(e)}"
+            }), 500
 
     def add_recommendation(self):
         data = request.get_json()
@@ -157,6 +277,48 @@ class BookRecommenderApp:
                     "ratings_count": ratings_count.get_text(strip=True) if ratings_count else "N/A"
                 }
         return {"link": "N/A", "average_rating": "N/A", "ratings_count": "N/A"}
+    
+
+    # def get_song_recommendations(self):
+    #     logger.info("=== Song Recommendation Route Started ===")
+    
+    #     if request.method == 'OPTIONS':
+    #         return jsonify({}), 200
+        
+    #     try:
+    #         data = request.get_json()
+    #         book_description = data.get('bookDescription')
+        
+    #         if not book_description:
+    #             logger.error("No book description provided")
+    #             return jsonify({
+    #             "success": False,
+    #             "message": "Book description is required"
+    #         }), 400
+            
+    #         logger.info(f"Getting song recommendations for book description")
+    #         recommendations = self.recommender.recommend_playlist_for_book(book_description)
+        
+    #         if not recommendations:
+    #             logger.warning("No song recommendations found")
+    #             return jsonify({
+    #             "success": False,
+    #             "message": "No song recommendations found"
+    #         }), 404
+            
+    #         logger.info(f"Successfully generated {len(recommendations)} song recommendations")
+    #         return jsonify({
+    #         "success": True,
+    #         "data": recommendations
+    #     }), 200
+        
+    #     except Exception as e:
+    #         logger.error(f"Error in song recommendations: {str(e)}", exc_info=True)
+    #         return jsonify({
+    #         "success": False,
+    #         "message": f"Error generating song recommendations: {str(e)}"
+    #     }), 500
+        
 
     def save_book_recommendation(self, book_name, author_name, genre, description, goodreads_data):
         try:

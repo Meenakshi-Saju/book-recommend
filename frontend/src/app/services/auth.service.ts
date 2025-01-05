@@ -33,6 +33,10 @@ export class AuthService {
 
     constructor(private http: HttpClient, private userService: UserService) { }  // Inject UserService
 
+    getUserPreferences(username: string): Observable<any> {
+        return this.http.get(`${this.baseUrl}/get-user-preferences/${username}`);
+    }
+
     registerUser(data: RegisterData): Observable<any> {
         const url = `${this.baseUrl}/register`;
         return this.http.post(url, data, {

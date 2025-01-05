@@ -69,22 +69,29 @@ export class TakeRecommendationComponent implements OnInit {
 
         console.log("Initiating recommendation request for user:", username);
 
-        this.http.post<RecommendationResponse>('http://localhost:5000/recommend', { username }).subscribe(
-            (response) => {
+        this.http.post<RecommendationResponse>('http://localhost:5000/recommend', { username }).subscribe({
+            next: (response) => {
                 console.log("Response received:", response);
-                if (response.success) {
-                    // Create a new book object with match scores
+                if (response.success && response.data) {
+                    // Initialize both book and playlist
                     this.recommendedBook = {
                         ...response.data.book,
-                        match_scores: response.data.match_scores  // Add match scores here
+                        match_scores: response.data.match_scores
                     };
-                    this.recommendedPlaylist = response.data.playlist;
+                    this.recommendedPlaylist = response.data.playlist || [];
                     console.log("Updated recommendedBook:", this.recommendedBook);
+                    console.log("Updated recommendedPlaylist:", this.recommendedPlaylist);
                 } else {
                     console.error("Error:", response.message);
+                    this.recommendedBook = null;
+                    this.recommendedPlaylist = [];
                 }
             },
-            (error) => console.error("API error:", error)
-        );
+            error: (error) => {
+                console.error("API error:", error);
+                this.recommendedBook = null;
+                this.recommendedPlaylist = [];
+            }
+        });
     }
 }
