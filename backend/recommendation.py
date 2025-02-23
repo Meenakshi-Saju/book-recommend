@@ -378,9 +378,9 @@ class HybridRecommender:
         
         # Combine all scores
             final_scores = (
-            notes_scores * 0.35 +      # Content-based
-            genre_scores * 0.35 +      # Genre matching
-            feedback_scores * 0.2 +   # User feedback
+            notes_scores * 0.45+      # Content-based
+            genre_scores * 0.3+      # Genre matching
+            feedback_scores * 0.15+   # User feedback
             collab_boost * 0.1        # Collaborative filtering boost
         )
         
