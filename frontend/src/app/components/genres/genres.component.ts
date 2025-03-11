@@ -8,9 +8,9 @@ interface PreferencesData {
   username: string;
   genres: string[];
   notes: string;
+  age?: number;
+  hobbies: string[]; // Add hobbies property
 }
-
-
 
 @Component({
   selector: 'app-genres',
@@ -20,7 +20,9 @@ interface PreferencesData {
 
 export class GenresComponent implements OnInit {
   selectedGenres: string[] = [];
+  selectedHobbies: string[] = []; // Add selectedHobbies array
   notes: string = '';
+  age: number | null = null;
   username: string;
 
   availableGenres = [
@@ -30,6 +32,17 @@ export class GenresComponent implements OnInit {
     'Fantasy',
     'Romance',
     'Young Adult'
+  ];
+
+  availableHobbies = [
+    'Reading',
+    'Sports',
+    'Music',
+    'Gaming',
+    'Travel',
+    'Cooking',
+    'Art',
+    'Outdoor Activities'
   ];
 
   constructor(
@@ -55,6 +68,8 @@ export class GenresComponent implements OnInit {
           if (response.success) {
             this.selectedGenres = response.data.genres || [];
             this.notes = response.data.notes || '';
+            this.age = response.data.age || null;
+            this.selectedHobbies = response.data.hobbies || []; // Get hobbies from response
             // Update checkboxes
             this.updateCheckboxes();
           }
@@ -65,37 +80,66 @@ export class GenresComponent implements OnInit {
   }
 
   private updateCheckboxes() {
-    // Update checkbox states based on selectedGenres
+    // Update genre checkboxes
     this.availableGenres.forEach(genre => {
       const checkbox = document.querySelector(`input[value="${genre}"]`) as HTMLInputElement;
       if (checkbox) {
         checkbox.checked = this.selectedGenres.includes(genre);
       }
     });
+
+    // Update hobby checkboxes
+    this.availableHobbies.forEach(hobby => {
+      const checkbox = document.querySelector(`input[value="${hobby}"]`) as HTMLInputElement;
+      if (checkbox) {
+        checkbox.checked = this.selectedHobbies.includes(hobby);
+      }
+    });
   }
 
   private setupModalHandlers() {
-    const genreText = document.getElementById('genreText');
     const genreModal = document.getElementById('genreModal')!;
     const notesModal = document.getElementById('notesModal')!;
+    const ageModal = document.getElementById('ageModal')!;
+    const hobbiesModal = document.getElementById('hobbiesModal')!; // Add hobbies modal
+
     const closeGenreModal = document.getElementById('closeGenreModal')!;
     const closeNotesModal = document.getElementById('closeNotesModal')!;
+    const closeAgeModal = document.getElementById('closeAgeModal')!;
+    const closeHobbiesModal = document.getElementById('closeHobbiesModal')!; // Add close hobbies modal
 
-    genreText?.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement;
-      if (target.id === 'genre') {
-        genreModal.style.display = 'flex';
-      } else if (target.id === 'notes') {
-        notesModal.style.display = 'flex';
-      }
+    // Set up click handlers for all elements
+    document.getElementById('genre')?.addEventListener('click', () => {
+      genreModal.style.display = 'flex';
     });
 
+    document.getElementById('notes')?.addEventListener('click', () => {
+      notesModal.style.display = 'flex';
+    });
+
+    document.getElementById('age')?.addEventListener('click', () => {
+      ageModal.style.display = 'flex';
+    });
+
+    document.getElementById('hobbies')?.addEventListener('click', () => {
+      hobbiesModal.style.display = 'flex';
+    });
+
+    // Set up close handlers
     closeGenreModal.addEventListener('click', () => {
       genreModal.style.display = 'none';
     });
 
     closeNotesModal.addEventListener('click', () => {
       notesModal.style.display = 'none';
+    });
+
+    closeAgeModal.addEventListener('click', () => {
+      ageModal.style.display = 'none';
+    });
+
+    closeHobbiesModal.addEventListener('click', () => {
+      hobbiesModal.style.display = 'none';
     });
   }
 
@@ -107,7 +151,15 @@ export class GenresComponent implements OnInit {
     }
   }
 
-  savePreferences(modalType: 'genres' | 'notes') {
+  onHobbyChange(event: any, hobby: string) {
+    if (event.target.checked) {
+      this.selectedHobbies.push(hobby);
+    } else {
+      this.selectedHobbies = this.selectedHobbies.filter(h => h !== hobby);
+    }
+  }
+
+  savePreferences(modalType: 'genres' | 'notes' | 'age' | 'hobbies') {
     const username = this.userService.getUsername();
     if (!username) {
       alert('Please log in first');
@@ -117,7 +169,9 @@ export class GenresComponent implements OnInit {
     const data = {
       username,
       genres: this.selectedGenres,
-      notes: this.notes
+      notes: this.notes,
+      age: this.age,
+      hobbies: this.selectedHobbies // Include hobbies in the data
     };
 
     this.authService.saveGenresAndNotes(data).subscribe({
@@ -125,7 +179,11 @@ export class GenresComponent implements OnInit {
         if (response.success) {
           alert('Preferences saved!');
           // Close only the current modal
-          const modal = document.getElementById(modalType === 'genres' ? 'genreModal' : 'notesModal');
+          const modal = document.getElementById(
+            modalType === 'genres' ? 'genreModal' :
+              modalType === 'notes' ? 'notesModal' :
+                modalType === 'age' ? 'ageModal' : 'hobbiesModal'
+          );
           if (modal) {
             modal.style.display = 'none';
           }

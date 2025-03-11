@@ -1,16 +1,16 @@
-Reg No,User name,Password,Genre,Notes,Recommended Books
-1,Abby,23sdfh,"Horror, Fiction",I like books that are thrilling. Horror books with very scary elements are what I live for.,
-2,Sam,565hgf,Non Fiction,I like Autobiographies,
-3,Gary,FHRHYH2,Fantasy,I love awesome epic books that are page turners.,
-4,Harold,rjfnwer,Horror,I want to be scared out of my mind. JUMPSCARES!,
-5,Harpy,23n234,Romance,I love sappy romances. They are the best. ,
-6,Gowri,shankar,Nonfiction,I like finance-related books. Anything about investments. I want to invest in stocks. ,
-7,Swifty,taylor,"Romance, Fiction",I love romance books that are swoon-worthy. ,
-8,Swiggy,zomato,"Science Fiction, Mystery, Classics, Fiction",I enjoy a good Charles Dickens book.,"['The Dark Web Murders (Inspector Sheehan Mysteries, #4)']"
-9,sanj,panda,"Fiction, Fantasy",something unique. a good fantasy. ,
-10,Lakshmi,12345,Fantasy,exotic,
-11,Aguni,123,Mystery,I like thrillers.,
-12,RGTYJ,123,"Fiction, Classics, Biography",FUN,
-18,Meenakshi,2003,"Fiction, Thriller, Romance",I like books with female protagonists. A good thriller book with subtle romance. I also enjoy books abour survival games.,
-19,Smrithi,2004,"Romance, Young Adult",I enjoy hopeless romantic books with tragic endings. Especially classics.,
-20,Jasm,12,Non Fiction,I enjoy non-fiction and autobiographies.,"['Christian Warrior Women: A Guide To Taking Back Your Faith, Family & Future (Christian Warrior Women Series Book 1)', 'Grace Of Giving: Turning The Key To Enter And Experience Fullness Of Life']"
+Reg No,User name,Password,Genre,Notes,Recommended Books,Age,Hobbies
+1,Abby,23sdfh,"Horror, Fiction",I like books that are thrilling. Horror books with very scary elements are what I live for.,,20,Outdoor Activities
+2,Sam,565hgf,Non Fiction,I like Autobiographies,,43,Reading
+3,Gary,FHRHYH2,Fantasy,I love awesome epic books that are page turners.,,26,Gaming
+4,Harold,rjfnwer,Horror,I want to be scared out of my mind. JUMPSCARES!,,19,Outdoor Activities
+5,Harpy,23n234,Romance,I love sappy romances. They are the best. ,,20,Music
+6,Gowri,shankar,Nonfiction,I like finance-related books. Anything about investments. I want to invest in stocks. ,"['The Great Book Of Amber (The Chronicles Of Amber, #1-10)']",29,Reading
+7,Swifty,taylor,"Romance, Fiction",I love romance books that are swoon-worthy. ,,21,Music
+8,Swiggy,zomato,"Science Fiction, Mystery, Classics, Fiction",I enjoy a good Charles Dickens book.,"['Shortcuts Get You Lost: A Leadership Fable On The Dangers Of The Blind Leading The Blind', ""Murder In The Coven: Maya'S Magical Adventures Continue"", 'Song Bird: Matters Of The Heart', ""Regular People Of The Weak: A Rebel'S Experience With The Spiritual Chief Of Poets"", 'The Taste Of Despair (The Master Of Perceptions, #3)', 'Wretched:', 'The Adventures Of Pinocchio', 'Running In Corridors', ""View Points And Points Of View: A 'Phoetry Book' From Cornwall"", 'The Dark Web Murders (Inspector Sheehan Mysteries, #4)']",23,Art
+9,sanj,panda,"Fiction, Fantasy",something unique. a good fantasy. ,,22,Gaming
+10,Lakshmi,12345,Fantasy,exotic,"[""Lord Foul'S Bane (The Chronicles Of Thomas Covenant The Unbeliever, #1)""]",24,Gaming
+11,Aguni,123,Mystery,I like thrillers.,,26,Gaming
+12,RGTYJ,123,"Fiction, Classics, Biography",FUN,,22,Outdoor Activities
+18,Meenakshi,2003,"Fiction, Thriller, Romance",I like books with female protagonists. A good thriller book with subtle romance. I also enjoy books abour survival games.,"['Ransom (The Light-Bearer, #5)', 'May Day (American Sulla, #1)', 'Ilium (Ilium, #1)', 'A Voice In The Wind (Mark Of The Lion, #1)', 'Dreamscape']",28,Reading
+19,Smrithi,2004,"Romance, Young Adult",I enjoy hopeless romantic books with tragic endings. Especially classics.,,24,Music
+20,Jasm,12,Non Fiction,I enjoy non-fiction and autobiographies.,"['Christian Warrior Women: A Guide To Taking Back Your Faith, Family & Future (Christian Warrior Women Series Book 1)', 'Grace Of Giving: Turning The Key To Enter And Experience Fullness Of Life']",30,Reading

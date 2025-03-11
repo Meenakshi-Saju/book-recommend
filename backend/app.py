@@ -41,7 +41,7 @@ class BookRecommenderApp:
                 logger.info("Creating new user CSV file")
                 with open(self.CSV_FILE_USER, 'w', newline='', encoding='utf-8') as file:
                     writer = csv.writer(file)
-                    writer.writerow(['SNo', 'User name', 'PassWord', 'Genre', 'Notes', 'Recommended Books'])
+                    writer.writerow(['SNo', 'User name', 'PassWord', 'Genre', 'Notes', 'Recommended Books', 'Age', 'Hobbies'])
 
             if not os.path.exists(self.CSV_FILE_BOOKS):
                 logger.info("Creating new books CSV file")
@@ -62,9 +62,11 @@ class BookRecommenderApp:
         self.app.route('/add-recommendation', methods=['POST'])(self.add_recommendation)
         self.app.route('/search-book', methods=['GET'])(self.search_book)
         self.app.route('/update-genres-notes', methods=['POST'])(self.update_genres_notes)
+        self.app.route('/update-profile', methods=['POST'])(self.update_profile)
         self.app.route('/register', methods=['POST'])(self.register)
         self.app.route('/login', methods=['POST'])(self.login)
         self.app.route('/song-recommendation', methods=['POST'])(self.login)
+        self.app.route('/get-user-profile/<username>', methods=['GET'])(self.get_user_profile)
         # self.app.route('/song-recommendation', methods=['POST', 'OPTIONS'])(self.get_song_recommendations)
     
     def get_playlist(self):
@@ -101,6 +103,30 @@ class BookRecommenderApp:
             logger.error(f"Error getting user preferences: {str(e)}", exc_info=True)
             return jsonify({"success": False, "message": "Failed to get preferences"}), 500
     
+    def get_user_profile(self, username):
+        try:
+            with open(self.CSV_FILE_USER, mode='r') as file:
+                reader = csv.reader(file)
+                next(reader)  # Skip header
+                for row in reader:
+                    if row[1] == username:
+                        # Check if we have age and hobbies fields (handle backwards compatibility)
+                        age = row[6] if len(row) > 6 else ""
+                        hobbies = row[7].split(', ') if len(row) > 7 and row[7] else []
+                        
+                        return jsonify({
+                            "success": True,
+                            "data": {
+                                "genres": row[3].split(', ') if row[3] else [],
+                                "notes": row[4],
+                                "age": age,
+                                "hobbies": hobbies
+                            }
+                        }), 200
+            return jsonify({"success": False, "message": "User not found"}), 404
+        except Exception as e:
+            logger.error(f"Error getting user profile: {str(e)}", exc_info=True)
+            return jsonify({"success": False, "message": "Failed to get user profile"}), 500
 
     def after_request(self, response):
         response.headers.add('Access-Control-Allow-Origin', 'http://localhost:4200')
@@ -277,48 +303,6 @@ class BookRecommenderApp:
                     "ratings_count": ratings_count.get_text(strip=True) if ratings_count else "N/A"
                 }
         return {"link": "N/A", "average_rating": "N/A", "ratings_count": "N/A"}
-    
-
-    # def get_song_recommendations(self):
-    #     logger.info("=== Song Recommendation Route Started ===")
-    
-    #     if request.method == 'OPTIONS':
-    #         return jsonify({}), 200
-        
-    #     try:
-    #         data = request.get_json()
-    #         book_description = data.get('bookDescription')
-        
-    #         if not book_description:
-    #             logger.error("No book description provided")
-    #             return jsonify({
-    #             "success": False,
-    #             "message": "Book description is required"
-    #         }), 400
-            
-    #         logger.info(f"Getting song recommendations for book description")
-    #         recommendations = self.recommender.recommend_playlist_for_book(book_description)
-        
-    #         if not recommendations:
-    #             logger.warning("No song recommendations found")
-    #             return jsonify({
-    #             "success": False,
-    #             "message": "No song recommendations found"
-    #         }), 404
-            
-    #         logger.info(f"Successfully generated {len(recommendations)} song recommendations")
-    #         return jsonify({
-    #         "success": True,
-    #         "data": recommendations
-    #     }), 200
-        
-    #     except Exception as e:
-    #         logger.error(f"Error in song recommendations: {str(e)}", exc_info=True)
-    #         return jsonify({
-    #         "success": False,
-    #         "message": f"Error generating song recommendations: {str(e)}"
-    #     }), 500
-        
 
     def save_book_recommendation(self, book_name, author_name, genre, description, goodreads_data):
         try:
@@ -362,8 +346,6 @@ class BookRecommenderApp:
                 return jsonify({"success": True, "data": results}), 200
         except FileNotFoundError:
             return jsonify({"success": False, "message": "Book data file not found."}), 500
-
-    
     
     def update_genres_notes(self):
         if request.method == 'OPTIONS':
@@ -394,12 +376,50 @@ class BookRecommenderApp:
                 writer = csv.writer(file)
                 writer.writerows(rows)
 
-            return jsonify({"success": True, "message": "Preferences updated successfuly!"}), 200
+            return jsonify({"success": True, "message": "Preferences updated successfully!"}), 200
 
         except Exception as e:
             logger.error(f"Update preferences error: {str(e)}", exc_info=True)
             return jsonify({"success": False, "message": "Failed to update preferences"}), 500
-        
+    
+    def update_profile(self):
+        if request.method == 'OPTIONS':
+            return jsonify({}), 200
+            
+        data = request.get_json()
+        username = data.get('username')
+        age = data.get('age', '')
+        hobbies = ', '.join(data.get('hobbies', [])) if data.get('hobbies') else ''
+
+        try:
+            with open(self.CSV_FILE_USER, mode='r') as file:
+                reader = csv.reader(file)
+                rows = list(reader)
+
+            user_found = False
+            for row in rows:
+                if row[1] == username:
+                    # Ensure we have enough columns for age and hobbies
+                    while len(row) < 8:
+                        row.append('')
+                    
+                    row[6] = str(age)  # Age at index 6
+                    row[7] = hobbies   # Hobbies at index 7
+                    user_found = True
+                    break
+
+            if not user_found:
+                return jsonify({"success": False, "message": "User not found"}), 404
+
+            with open(self.CSV_FILE_USER, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows(rows)
+
+            return jsonify({"success": True, "message": "Profile updated successfully!"}), 200
+
+        except Exception as e:
+            logger.error(f"Update profile error: {str(e)}", exc_info=True)
+            return jsonify({"success": False, "message": "Failed to update profile"}), 500
 
     def register(self):
         if request.method == 'OPTIONS':
@@ -408,6 +428,8 @@ class BookRecommenderApp:
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
+        age = data.get('age', '')
+        hobbies = ', '.join(data.get('hobbies', [])) if data.get('hobbies') else ''
 
         if not username or not password:
             return jsonify({"success": False, "message": "Username and password are required"}), 400
@@ -422,7 +444,7 @@ class BookRecommenderApp:
             new_sno = last_sno + 1
             with open(self.CSV_FILE_USER, mode='a', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerow([new_sno, username, password, '', ''])
+                writer.writerow([new_sno, username, password, '', '', '', age, hobbies])
 
             return jsonify({"success": True, "message": "Registration successful!"}), 201
 
@@ -452,14 +474,6 @@ class BookRecommenderApp:
         except Exception as e:
             logger.error(f"Login error: {str(e)}", exc_info=True)
             return jsonify({"success": False, "message": "Login failed"}), 500
-
-        
-
-
-    
-    
-
-    
 
 # Create the application instance
 app_instance = BookRecommenderApp()
