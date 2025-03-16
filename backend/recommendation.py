@@ -380,161 +380,145 @@ class HybridRecommender:
             return min_threshold + (100 - min_threshold) * (score / 100)
 
     def recommend_books_for_user(self, username, debug=False):
-        """Enhanced recommendation function incorporating user feedback, age, and hobbies."""
+        """Enhanced recommendation function with prioritized genre filtering and debugging statements."""
         if username not in self.users_df['User name'].values:
             return {"error": f"User '{username}' not found."}
 
         user_info = self.get_user_info(username)
-        preferred_genres = user_info['genres']
+        preferred_genres = {g.lower().strip() for g in user_info['genres']}
         notes = user_info['notes']
         age = user_info.get('age', '')
         hobbies = user_info.get('hobbies', [])
-        
+
         if debug:
             print(f"User: {username}")
+            print(f"Preferred Genres: {preferred_genres}")
+            print(f"Notes: {notes}")
             print(f"Age: {age}")
             print(f"Hobbies: {hobbies}")
-            print(f"Preferred genres: {preferred_genres}")
-            print(f"Notes: {notes}")
-
-        if not notes or pd.isna(notes):
-            notes = '' 
 
         recommended_books = user_info['recommendations']
-        
-        # Get age-appropriate and hobby-related genres
-        age_genres = self.get_age_appropriate_genres(age)
-        hobby_genres = self.get_hobby_related_genres(hobbies)
-        
-        if debug:
-            print(f"Age-appropriate genres: {age_genres}")
-            print(f"Hobby-related genres: {hobby_genres}")
 
-        # Calculate genre matches and filter
-        genre_matches = []
+    # Strict fiction vs non-fiction filter
+        is_fiction = 'Fiction' in preferred_genres
+        is_non_fiction = 'Non Fiction' in preferred_genres
+
+        age_genres = {g.lower().strip() for g in self.get_age_appropriate_genres(age)}
+        hobby_genres = {g.lower().strip() for g in self.get_hobby_related_genres(hobbies)}
+        combined_genres = preferred_genres.union(age_genres).union(hobby_genres)
+
+        genre_scores = []
+        genre_penalties = []
+        valid_indices = []
+
         for book_idx, book_genres in enumerate(self.books_df['Genres']):
-            match_score = self.calculate_genre_match(book_genres, preferred_genres, age_genres, hobby_genres)
-            if match_score > 20:
-                genre_matches.append((book_idx, match_score))
-                if debug:
-                    print(f"Book {self.books_df.iloc[book_idx]['Book']} matched with score {match_score}")
+            if pd.isna(book_genres) or book_genres.strip() == "":
+                # genre_penalties.append(-50)  # Apply a penalty but don't remove the book
+                continue 
+            book_genres = str(book_genres).lower().strip()
+            book_genre_set = set(book_genres.split(','))
 
-        if not genre_matches:
-            return {"error": f"No books found matching your preferences for genres, age, and hobbies."}
+
+            fiction_penalty = -30 if (is_fiction and 'non-fiction' in book_genre_set) or (is_non_fiction and 'fiction' in book_genre_set) else 0
+
+
+            if not any(pref in book_genres for pref in preferred_genres):
+                continue  # Remove books if they have no partial genre match
         
+            match_score = self.calculate_genre_match(book_genres, preferred_genres, age_genres, hobby_genres)
+            if match_score > 35:
+                genre_scores.append(match_score)
+                genre_penalties.append(fiction_penalty)  # Store penalty separately
+                valid_indices.append(book_idx)
+    
+        if debug:
+            print(f"Valid books after filtering: {len(valid_indices)}")
+    
+        if not valid_indices:
+            return {"error": "No books found matching your preferences."}
 
-        matched_indices = [idx for idx, _ in genre_matches]
-        filtered_books = self.books_df.iloc[matched_indices].copy()
-        genre_scores = np.array([score for _, score in genre_matches])
+        filtered_books = self.books_df.iloc[valid_indices].copy()
+        genre_scores = np.array(genre_scores)
+        genre_penalties = np.array(genre_penalties)
 
-        # Remove recommended books
+
+        genre_scores = self.normalize_score(genre_scores)
+
         mask = ~filtered_books['Book'].isin(recommended_books)
         filtered_books = filtered_books[mask]
         genre_scores = genre_scores[mask]
-        
+        genre_penalties = genre_penalties[mask]
+
+
         if filtered_books.empty:
-            return {"error": "No unrecommended books found matching your preferences."}
-        
-        try:
-            # Calculate content similarity based on notes
-            if notes.strip():
-                user_embedding = self.load_model().encode([notes])
-                filtered_embeddings = self.get_book_embeddings()[filtered_books.index]
-                cosine_sim = cosine_similarity(user_embedding, filtered_embeddings)[0]
-                notes_scores = self.normalize_score(cosine_sim * 100)
-            else:
-                # If no notes, use neutral scores
-                notes_scores = np.full(len(filtered_books), 70)
-        
-            # Normalize genre scores
-            genre_scores = self.normalize_score(genre_scores)
-        
-            # Add feedback scores
-            feedback_scores = np.array([
-                self.get_user_feedback_score(username, book_title)
-                for book_title in filtered_books['Book']
-            ])
-            feedback_scores = self.normalize_score(feedback_scores)
-        
-            # Get collaborative filtering recommendations
-            similar_books = set()
-            for book_title in filtered_books['Book']:
-                similar_books.update(self.get_similar_books_by_feedback(username, book_title))
-        
-            # Boost scores for collaborative filtering recommendations
-            collab_boost = np.zeros_like(feedback_scores)
-            for i, book in enumerate(filtered_books['Book']):
-                if book in similar_books:
-                    collab_boost[i] = 30  # Boost score by 30 points
-        
-            # Combine all scores with updated weightage
-            final_scores = (
-                notes_scores * 0.35 +   
-                genre_scores * 0.35 +    
-                feedback_scores * 0.20 + 
-                collab_boost * 0.10     
-                
-            )
-        
-            final_scores = self.normalize_score(final_scores, min_threshold=70)
-            best_match_idx = np.argmax(final_scores)
-            most_similar_book = filtered_books.iloc[best_match_idx]
-        
-            # Update recommendations
-            new_book = most_similar_book['Book']
-            if new_book not in recommended_books:
-                recommended_books.add(new_book)
-                self.users_df.loc[self.users_df['User name'] == username, 'Recommended Books'] = str(list(recommended_books))
-                self.users_df.to_csv('User.csv', index=False)
-                self._user_cache[username]['recommendations'] = recommended_books
+            return {"error": "No new books found matching your preferences."}
 
-            playlist = self.recommend_playlist_for_book(most_similar_book['Description'])
-
-            return {
-                "book": {
-                    "title": most_similar_book['Book'],
-                    "author": most_similar_book['Author'],
-                    "rating": most_similar_book['Avg_Rating'],
-                    "genre": most_similar_book['Genres'],
-                    "url": most_similar_book['URL'],
-                    "description": most_similar_book['Description']
-                },
-                "match_scores": {
-                    "overall_match": round(float(final_scores[best_match_idx]), 1),
-                    "notes_match": round(float(notes_scores[best_match_idx]), 1),
-                    "genre_match": round(float(genre_scores[best_match_idx]), 1),
-                    "feedback_match": round(float(feedback_scores[best_match_idx]), 1),
-                    "age_appropriate": "Yes" if age_genres and any(g.lower() in most_similar_book['Genres'].lower() for g in age_genres) else "No",
-                    "hobby_related": "Yes" if hobby_genres and any(g.lower() in most_similar_book['Genres'].lower() for g in hobby_genres) else "No"
-                },
-                "playlist": playlist
-            }
+        if notes.strip():
+            user_embedding = self.load_model().encode([notes])
+            filtered_embeddings = self.get_book_embeddings()[filtered_books.index]
+            cosine_sim = cosine_similarity(user_embedding, filtered_embeddings)[0]
+            notes_scores = self.normalize_score(cosine_sim * 100)
+        else:
+            notes_scores = np.full(len(filtered_books), 70)
     
-        except Exception as e:
-            print(f"Error in recommendation: {str(e)}")
-            # Return a simplified recommendation based only on genre if there's an error
-            best_genre_idx = np.argmax(genre_scores)
-            fallback_book = filtered_books.iloc[best_genre_idx]
-        
-            return {
-                "book": {
-                    "title": fallback_book['Book'],
-                    "author": fallback_book['Author'],
-                    "rating": fallback_book['Avg_Rating'],
-                    "genre": fallback_book['Genres'],
-                    "url": fallback_book['URL'],
-                    "description": fallback_book['Description']
-                },
-                "match_scores": {
-                    "overall_match": round(float(genre_scores[best_genre_idx]), 1),
-                    "notes_match": 70.0,  # Default score
-                    "genre_match": round(float(genre_scores[best_genre_idx]), 1),
-                    "feedback_match": 70.0,  # Default score
-                    "age_appropriate": "Yes" if age_genres and any(g.lower() in fallback_book['Genres'].lower() for g in age_genres) else "No",
-                    "hobby_related": "Yes" if hobby_genres and any(g.lower() in fallback_book['Genres'].lower() for g in hobby_genres) else "No"
-                },
-                "playlist": self.recommend_playlist_for_book(fallback_book['Description'])
-            }
+        feedback_scores = np.array([
+         self.get_user_feedback_score(username, book_title)
+        for book_title in filtered_books['Book']
+    ])
+        feedback_scores = self.normalize_score(feedback_scores)
+
+        hobby_boost = np.array([
+            genre_scores[i] * 0.10 if any(hobby in book_genres for hobby in hobby_genres) else 0
+        for i, book_genres in enumerate(filtered_books['Genres'])
+            ])
+
+
+        # genre_scores = self.normalize_score(genre_scores[:len(filtered_books)])
+        # notes_scores = self.normalize_score(notes_scores[:len(filtered_books)])
+        # feedback_scores = self.normalize_score(feedback_scores[:len(filtered_books)])
+
+        final_scores = (
+       genre_scores * 0.50 +  # Strongest weight
+        notes_scores * 0.30 +  # Secondary factor
+        feedback_scores * 0.10 +  # Mild influence
+        hobby_boost -  # Hobby boost (scaled properly)
+        genre_penalties  # Penalty for weak matches
+    )
+    
+        best_match_idx = np.argmax(final_scores)
+        most_similar_book = filtered_books.iloc[best_match_idx]
+    
+        if debug:
+            print(f"Selected Book: {most_similar_book['Book']}")
+            print(f"Final Score: {final_scores[best_match_idx]}")
+
+        new_book = most_similar_book['Book']
+        if new_book not in recommended_books:
+            recommended_books.add(new_book)
+            self.users_df.loc[self.users_df['User name'] == username, 'Recommended Books'] = str(list(recommended_books))
+            self.users_df.to_csv('User.csv', index=False)
+            self._user_cache[username]['recommendations'] = recommended_books
+
+        playlist = self.recommend_playlist_for_book(most_similar_book['Description'])
+
+        return {
+        "book": {
+            "title": most_similar_book['Book'],
+            "author": most_similar_book['Author'],
+            "rating": most_similar_book['Avg_Rating'],
+            "genre": most_similar_book['Genres'],
+            "url": most_similar_book['URL'],
+            "description": most_similar_book['Description']
+        },
+        "match_scores": {
+            "overall_match": round(float(final_scores[best_match_idx]), 1),
+            "notes_match": round(float(notes_scores[best_match_idx]), 1),
+            "genre_match": round(float(genre_scores[best_match_idx]), 1),
+            "feedback_match": round(float(feedback_scores[best_match_idx]), 1),
+        },
+        "playlist": playlist
+    }
+
 
     def get_playlist(self, book_title):
         """Get a playlist recommendation for a given book title."""

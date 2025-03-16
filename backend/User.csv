@@ -1,16 +1,26 @@
 Reg No,User name,Password,Genre,Notes,Recommended Books,Age,Hobbies
-1,Abby,23sdfh,"Horror, Fiction",I like books that are thrilling. Horror books with very scary elements are what I live for.,,20,Outdoor Activities
-2,Sam,565hgf,Non Fiction,I like Autobiographies,,43,Reading
-3,Gary,FHRHYH2,Fantasy,I love awesome epic books that are page turners.,,26,Gaming
-4,Harold,rjfnwer,Horror,I want to be scared out of my mind. JUMPSCARES!,,19,Outdoor Activities
-5,Harpy,23n234,Romance,I love sappy romances. They are the best. ,,20,Music
-6,Gowri,shankar,Nonfiction,I like finance-related books. Anything about investments. I want to invest in stocks. ,"['The Great Book Of Amber (The Chronicles Of Amber, #1-10)']",29,Reading
-7,Swifty,taylor,"Romance, Fiction",I love romance books that are swoon-worthy. ,,21,Music
-8,Swiggy,zomato,"Science Fiction, Mystery, Classics, Fiction",I enjoy a good Charles Dickens book.,"['Shortcuts Get You Lost: A Leadership Fable On The Dangers Of The Blind Leading The Blind', ""Murder In The Coven: Maya'S Magical Adventures Continue"", 'Song Bird: Matters Of The Heart', ""Regular People Of The Weak: A Rebel'S Experience With The Spiritual Chief Of Poets"", 'The Taste Of Despair (The Master Of Perceptions, #3)', 'Wretched:', 'The Adventures Of Pinocchio', 'Running In Corridors', ""View Points And Points Of View: A 'Phoetry Book' From Cornwall"", 'The Dark Web Murders (Inspector Sheehan Mysteries, #4)']",23,Art
-9,sanj,panda,"Fiction, Fantasy",something unique. a good fantasy. ,,22,Gaming
-10,Lakshmi,12345,Fantasy,exotic,"[""Lord Foul'S Bane (The Chronicles Of Thomas Covenant The Unbeliever, #1)""]",24,Gaming
-11,Aguni,123,Mystery,I like thrillers.,,26,Gaming
-12,RGTYJ,123,"Fiction, Classics, Biography",FUN,,22,Outdoor Activities
-18,Meenakshi,2003,"Fiction, Thriller, Romance",I like books with female protagonists. A good thriller book with subtle romance. I also enjoy books abour survival games.,"['Ransom (The Light-Bearer, #5)', 'May Day (American Sulla, #1)', 'Ilium (Ilium, #1)', 'A Voice In The Wind (Mark Of The Lion, #1)', 'Dreamscape']",28,Reading
-19,Smrithi,2004,"Romance, Young Adult",I enjoy hopeless romantic books with tragic endings. Especially classics.,,24,Music
-20,Jasm,12,Non Fiction,I enjoy non-fiction and autobiographies.,"['Christian Warrior Women: A Guide To Taking Back Your Faith, Family & Future (Christian Warrior Women Series Book 1)', 'Grace Of Giving: Turning The Key To Enter And Experience Fullness Of Life']",30,Reading
+1.0,Abby,23sdfh,"Horror, Fiction",I like books that are thrilling. Horror books with very scary elements are what I live for.,,20,Outdoor Activities
+2.0,Sam,565hgf,Non Fiction,I like Autobiographies,,43,Reading
+3.0,Gary,FHRHYH2,Fantasy,I love books with dragons and mythical creatures.,"['Dark Matter', ""Captain'S Fury (Codex Alera, #4)""]",26,Gaming
+4.0,Harold,rjfnwer,Horror,I want to be scared out of my mind. JUMPSCARES!,,19,Outdoor Activities
+5.0,Harpy,23n234,Romance,I love sappy romances. They are the best. ,,20,Music
+6.0,Gowri,shankar,Non Fiction,I like finance-related books. Anything about investments. I want to invest in stocks. ,,29,Reading
+7.0,Swifty,taylor,"Romance, Fiction",I love romance books that are swoon-worthy. ,,21,Music
+8.0,Swiggy,zomato,"Classics, Fiction",I enjoy a good Charles Dickens book.,,23,Art
+9.0,sanj,panda,"Fiction, Fantasy","A good book about kings, princes, princesses and castles is what I enjoy.",,22,Gaming
+10.0,Lakshmi,12345,Fantasy,I absolutely love stories about heroes and their tales of victories ,,24,Gaming
+11.0,Aguni,123,"Mystery, Thriller",I like thrillers.,,26,Gaming
+12.0,RGTYJ,123,"Fiction, Classics, Biography",FUN,,22,Outdoor Activities
+18.0,Meenakshi,2003,"Fiction, Romance",I like books with female protagonists. A good thriller book with subtle romance.,,28,Reading
+19.0,Smrithi,2004,"Romance, Young Adult",I enjoy hopeless romantic books with tragic endings. Especially classics.,,24,Music
+20.0,Jasm,12,Non Fiction,I enjoy non-fiction and autobiographies.,,30,Reading
+,synthetic_user_0,,"Young Adult,Fantasy",I enjoy books with Young Adult and Fantasy. Looking for engaging stories.,,15,"reading,gaming"
+,synthetic_user_1,,"Science Fiction,Young Adult",I enjoy books with Science Fiction and Young Adult. Looking for engaging stories.,,25,"art,music"
+,synthetic_user_2,,"Romance,Fantasy",I enjoy books with Romance and Fantasy. Looking for engaging stories.,,45,"reading,gaming"
+,synthetic_user_3,,"Romance,Thriller",I enjoy books with Romance and Thriller. Looking for engaging stories.,,25,"art,gaming"
+,synthetic_user_4,,"Thriller,Young Adult",I enjoy books with Thriller and Young Adult. Looking for engaging stories.,,15,"music,gaming"
+,synthetic_user_5,,"Young Adult,Thriller,Historical Fiction",I enjoy books with Young Adult and Thriller and Historical Fiction. Looking for engaging stories.,,15,"music,travel"
+,synthetic_user_6,,"Science Fiction,Mystery",I enjoy books with Science Fiction and Mystery. Looking for engaging stories.,,15,"art,travel"
+,synthetic_user_7,,"Fantasy,Science Fiction",I enjoy books with Fantasy and Science Fiction. Looking for engaging stories.,,15,"gaming,music"
+,synthetic_user_8,,"Young Adult,Fantasy,Literary Fiction",I enjoy books with Young Adult and Fantasy and Literary Fiction. Looking for engaging stories.,,15,"music,travel"
+,synthetic_user_9,,"Historical Fiction,Literary Fiction",I enjoy books with Historical Fiction and Literary Fiction. Looking for engaging stories.,,35,"reading,music"
